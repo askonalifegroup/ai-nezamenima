@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-НЕЗАМЕНИМА — итоги курса</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#11162b;
+  --bg-soft:#161c37;
+  --card:#1b2242;
+  --card-border:#2a3363;
+  --ink:#f2efe8;
+  --muted:#9099c0;
+  --muted-2:#6b7399;
+  --gold:#e8a33d;
+  --gold-soft:#ffcf85;
+  --mint:#6fbf9e;
+  --rose:#e2687a;
+  --line:#2a3363;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:radial-gradient(1200px 800px at 10% -10%, #1a2148 0%, var(--bg) 55%);
+  color:var(--ink);
+  font-family:'Inter',sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:48px 28px 90px;}
+h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;margin:0;}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;}
+
+/* HERO */
+.hero{display:flex;flex-wrap:wrap;gap:36px;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:36px;margin-bottom:40px;}
+.hero h1{font-size:44px;line-height:1.08;max-width:640px;}
+.hero p.sub{color:var(--muted);margin-top:12px;font-size:15px;max-width:560px;}
+.hero-stats{display:flex;gap:28px;flex-wrap:wrap;}
+.hero-stat{text-align:right;}
+.hero-stat .num{font-family:'Fraunces',serif;font-size:32px;color:var(--gold-soft);}
+.hero-stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;}
+
+/* KPI GRID */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:48px;}
+.kpi{background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:20px 20px;position:relative;overflow:hidden;}
+.kpi:before{content:"";position:absolute;top:0;left:0;width:3px;height:100%;background:var(--gold);}
+.kpi.mint:before{background:var(--mint);}
+.kpi.rose:before{background:var(--rose);}
+.kpi .val{font-family:'Fraunces',serif;font-size:30px;color:var(--ink);}
+.kpi .lbl{color:var(--muted);font-size:12.5px;margin-top:6px;line-height:1.4;}
+
+/* SECTION */
+section{margin-bottom:56px;}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px;gap:16px;flex-wrap:wrap;}
+.section-head h2{font-size:26px;}
+.section-head .note{color:var(--muted);font-size:13px;}
+
+.grid-2{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+@media(max-width:860px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+
+.card{background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:22px 22px;}
+.card h3{font-size:15px;font-family:'Inter',sans-serif;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:16px;}
+
+/* STAIRCASE (signature element) */
+.staircase{display:flex;align-items:flex-end;gap:10px;height:220px;padding:10px 4px 0;}
+.step{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:8px;}
+.step .bar{width:100%;border-radius:8px 8px 4px 4px;background:linear-gradient(180deg,var(--gold-soft),var(--gold));position:relative;transition:height .6s ease;}
+.step .bar .score{position:absolute;top:-24px;left:0;right:0;text-align:center;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold-soft);}
+.step .name{font-size:11px;color:var(--muted);text-align:center;line-height:1.3;min-height:32px;}
+.step .n{font-size:10px;color:var(--muted-2);font-family:'JetBrains Mono',monospace;}
+
+/* FILTERS */
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;}
+.filters select, .filters button{
+  background:var(--bg-soft);color:var(--ink);border:1px solid var(--card-border);
+  border-radius:8px;padding:8px 12px;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;
+}
+.filters button.active{background:var(--gold);color:#1b1300;border-color:var(--gold);font-weight:600;}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+th{text-align:left;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--line);}
+td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.04);}
+tr:hover td{background:rgba(255,255,255,0.02);}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge.paid{background:rgba(111,191,158,0.15);color:var(--mint);}
+.badge.issue{background:rgba(226,104,122,0.15);color:var(--rose);}
+.badge.internal{background:rgba(144,153,192,0.15);color:var(--muted);}
+.badge.cert{background:rgba(232,163,61,0.15);color:var(--gold-soft);}
+.badge.none{background:rgba(255,255,255,0.05);color:var(--muted-2);}
+
+/* COMMENTS */
+.comment{border-bottom:1px solid var(--line);padding:14px 0;}
+.comment:last-child{border-bottom:none;}
+.comment .meta{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-bottom:6px;font-family:'JetBrains Mono',monospace;}
+.comment .meta .score{color:var(--gold-soft);}
+.comment .meta .score.low{color:var(--rose);}
+.comment p{margin:0;font-size:14px;line-height:1.5;color:#dfe0f0;}
+.comment .who{color:var(--muted-2);font-style:italic;font-size:12.5px;margin-top:5px;}
+
+.chart-box{position:relative;height:260px;}
+
+.insights{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+.insight{background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:22px 20px;position:relative;}
+.insight-n{font-family:'Fraunces',serif;font-size:26px;color:var(--gold);opacity:.55;margin-bottom:10px;}
+.insight h4{font-family:'Fraunces',serif;font-size:16.5px;font-weight:600;margin:0 0 10px;line-height:1.3;color:var(--ink);}
+.insight p{font-size:13px;line-height:1.55;color:#c7cbe8;margin:0 0 14px;}
+.insight .tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.04em;color:var(--muted);border:1px solid var(--card-border);border-radius:20px;padding:4px 10px;}
+
+footer{text-align:center;color:var(--muted-2);font-size:12px;margin-top:60px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Корпоративный университет · ALG</div>
+      <h1>AI-НЕЗАМЕНИМА<br>итоги курса для ассистентов</h1>
+      <p class="sub">5 модулей, 48 ответов обратной связи и 39 внешних участников — от первого погружения в AI до защиты собственного AI-рабочего дня.</p>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num" id="heroRevenue">—</div><div class="lbl">выручка без НДС, ₽</div></div>
+      <div class="hero-stat"><div class="num" id="heroNPS">—</div><div class="lbl">средний NPS</div></div>
+      <div class="hero-stat"><div class="num" id="heroParticipants">—</div><div class="lbl">участников</div></div>
+    </div>
+  </div>
+
+  <div class="kpis" id="kpiRow"></div>
+
+  <section>
+    <div class="section-head">
+      <h2>Путь курса: динамика оценок по модулям</h2>
+      <div class="note">высота ступени = средний NPS модуля, % · n = число ответивших</div>
+    </div>
+    <div class="card">
+      <div class="staircase" id="staircase"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><h2>Клиенты и оплаты</h2><div class="note" id="clientsNote"></div></div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Список участников</h3>
+        <div class="filters" id="clientFilters"></div>
+        <div style="max-height:420px;overflow:auto;">
+          <table id="clientTable">
+            <thead><tr><th>ФИО</th><th>Компания</th><th>Сумма</th><th>Оплата</th><th>Итог курса</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Статус оплат</h3>
+        <div class="chart-box" style="height:420px;"><canvas id="paymentStatus"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><h2>Динамика оценок по критериям</h2><div class="note">средний балл по шкале 1–10, по каждому вопросу опроса</div></div>
+    <div class="card">
+      <div class="chart-box" style="height:320px;"><canvas id="moduleScores"></canvas></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><h2>Готовность рекомендовать курс (NPS)</h2><div class="note">% промоутеров (9–10) минус % критиков (0–6), стандартная формула NPS</div></div>
+    <div class="card">
+      <div class="chart-box" style="height:260px;"><canvas id="npsChart"></canvas></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>ТОП-5 выводов из обратной связи</h2>
+      <div class="note">на основе 48 ответов и текстовых комментариев участников</div>
+    </div>
+    <div class="insights">
+      <div class="insight">
+        <div class="insight-n">01</div>
+        <h4>Не хватает практики — особенно в начале курса</h4>
+        <p>На МК1 несколько участников прямо просят больше практических заданий и меньше теории: «больше практики и попроще», «важно больше примеров».</p>
+        <div class="tag">МК1 Погружение в AI</div>
+      </div>
+      <div class="insight">
+        <div class="insight-n">02</div>
+        <h4>МК2 «Cowork и AI-агенты» — самый слабый модуль</h4>
+        <p>Здесь минимальные оценки всего опроса (6–7 баллов): «было впечатление хаоса», «практика в процессе неудобна». У части участников не было доступа к платному Claude, что мешало практике вживую.</p>
+        <div class="tag">МК2 Cowork и AI-агенты</div>
+      </div>
+      <div class="insight">
+        <div class="insight-n">03</div>
+        <h4>Темп и длительность МК1 утомляют новичков</h4>
+        <p>Вводный модуль рассчитан на разный уровень подготовки: «галопом по европам, на скорости х4», «тяжеловато в плане 2,5 часов, под конец мозг закипает».</p>
+        <div class="tag">МК1 Погружение в AI</div>
+      </div>
+      <div class="insight">
+        <div class="insight-n">04</div>
+        <h4>К финалу курса — почти максимальная удовлетворённость</h4>
+        <p>МК3–МК5 стабильно получают 9–10 баллов и NPS около 100%: «все отлично, было интересно посмотреть на кейсы участников», «заложенный фундамент, который можно перестраивать».</p>
+        <div class="tag">МК3–МК5</div>
+      </div>
+      <div class="insight">
+        <div class="insight-n">05</div>
+        <h4>Инструменты заходят по-разному: NotebookLM — восторг, Obsidian — непонятно</h4>
+        <p>В одном и том же отзыве по МК4: «NotebookLM прям открытие!» и тут же «Obsidian пока не очень поняла насколько полезно будет» — стоит отдельно разобрать применение Obsidian на практике.</p>
+        <div class="tag">МК4 Notion: база знаний</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Все комментарии</h2>
+      <div class="note" id="commentsNote"></div>
+    </div>
+    <div class="card">
+      <div class="filters" id="commentFilters"></div>
+      <div id="commentsList" style="max-height:520px;overflow:auto;"></div>
+    </div>
+  </section>
+
+  <footer>Дашборд собран автоматически из данных Google Таблиц · курс «AI-НЕЗАМЕНИМА»</footer>
+</div>
+
+<script>
+/* ================= DATA ================= */
+const clients = [
+{name:"Горохов В.В.",type:"Внешний",company:"ИП Горохов (розница)",status:"paid",amount:32300,manager:"Вера",completion:"none"},
+{name:"Сергиенко А.В.",type:"Внешний",company:"Барс Консалт",status:"paid",amount:32300,manager:"Вера",completion:"cert"},
+{name:"Ширингина Ю.О.",type:"Внешний",company:"ООО «Невидимые решётки»",status:"paid",amount:25194,manager:"Вера",completion:"none"},
+{name:"Борисочкина К.В.",type:"Внешний",company:"ООО «Невидимые решётки»",status:"paid",amount:25194,manager:"Вера",completion:"none"},
+{name:"Китюха А.С.",type:"Внешний",company:"Другие миры",status:"paid",amount:32300,manager:"Ира",completion:"none"},
+{name:"Исакова О.Е.",type:"Внешний",company:"Физ. лицо",status:"issue",amount:32300,manager:"Ира",completion:"cert"},
+{name:"Специан Н.",type:"Внешний",company:"АНО ДПО «Академия ТОП»",status:"paid",amount:109820,manager:"Ира",completion:"none"},
+{name:"Новоселова О.",type:"Внешний",company:"АНО ДПО «Академия ТОП»",status:"paid",amount:0,manager:"Ира",completion:"cert"},
+{name:"Сергеева А.",type:"Внешний",company:"АНО ДПО «Академия ТОП»",status:"paid",amount:0,manager:"Ира",completion:"cert"},
+{name:"Бабурян Р.",type:"Внешний",company:"АНО ДПО «Академия ТОП»",status:"paid",amount:0,manager:"Ира",completion:"none"},
+{name:"Лабзина О.А.",type:"Внешний",company:"ООО «Сокол-Т»",status:"paid",amount:32300,manager:"Ира",completion:"none"},
+{name:"Андрей Ш.",type:"Внешний",company:"ООО «Мониторинг-Сервис»",status:"paid",amount:32300,manager:"Вера",completion:"cert"},
+{name:"Камалова К.Р.",type:"Внешний",company:"«Телематика-сервис» (ЮМС)",status:"paid",amount:32300,manager:"—",completion:"none"},
+{name:"Дарья Ф.",type:"Внешний",company:"ИП Романов РР",status:"paid",amount:32300,manager:"Вера",completion:"cert"},
+{name:"Бычина К.В.",type:"Внешний",company:"ИП Унжакова Вероника",status:"paid",amount:32300,manager:"Вера",completion:"none"},
+{name:"Емельянова Н.А.",type:"Внешний",company:"Би Смарт",status:"paid",amount:32300,manager:"Вера",completion:"none"},
+{name:"Каплан Е.Р.",type:"Внешний",company:"Амбитика Медиа Плюс",status:"paid",amount:27455,manager:"Вера",completion:"none"},
+{name:"Азаренков К.А.",type:"Внешний",company:"Амбитика Медиа Плюс",status:"paid",amount:27455,manager:"Вера",completion:"none"},
+{name:"Элькина П.М.",type:"Внешний",company:"Амбитика Медиа Плюс",status:"paid",amount:27455,manager:"Вера",completion:"none"},
+{name:"Комина Е.М.",type:"Внешний",company:"Амбитика Медиа Плюс",status:"paid",amount:27455,manager:"Вера",completion:"none"},
+{name:"Ижболдина П.Г.",type:"Внешний",company:"Амбитика Медиа Плюс",status:"paid",amount:27455,manager:"Вера",completion:"cert"},
+{name:"Юлия Л.",type:"Внешний",company:"ООО «Премьера»",status:"paid",amount:32300,manager:"Вера",completion:"cert"},
+{name:"Веселова Ю.В.",type:"Внешний",company:"ООО «Кант»",status:"paid",amount:32300,manager:"Вера",completion:"none"},
+{name:"Елисеева Е.С.",type:"Внешний",company:"ООО «Первая Розничная компания»",status:"paid",amount:32300,manager:"Вера",completion:"none"},
+{name:"Пинчина А.Д.",type:"Внешний",company:"ООО «Первая Розничная компания»",status:"paid",amount:32300,manager:"Вера",completion:"cert"},
+{name:"Касьянов А.",type:"Внешний",company:"Физ. лицо",status:"paid",amount:29000,manager:"Ира",completion:"cert"},
+{name:"Гиганова С.",type:"Внешний",company:"«Ветер востока»",status:"issue",amount:29000,manager:"Ира",completion:"none"},
+{name:"Кременец Е.А.",type:"Внешний",company:"КВ Системы",status:"paid",amount:32300,manager:"Вера",completion:"none"},
+{name:"Дмитрий Р.",type:"Внешний",company:"ИП Русских А.Н.",status:"paid",amount:32300,manager:"Вера",completion:"none"},
+{name:"Долинина О.",type:"Внешний",company:"ООО «Крем-шоп»",status:"paid",amount:25840,manager:"Вера",completion:"cert"},
+{name:"Керчелаева А.",type:"Внешний",company:"ООО «Крем-шоп»",status:"paid",amount:25840,manager:"Вера",completion:"cert"},
+{name:"Рудяков Г.",type:"Внешний",company:"«Летуаль»",status:"paid",amount:29000,manager:"Вера",completion:"none"},
+{name:"Ольга Ф.",type:"Внешний",company:"«Летуаль»",status:"paid",amount:29000,manager:"Вера",completion:"none"},
+{name:"Комосов Д.Ю.",type:"Внешний",company:"«Летуаль» / физ.лицо",status:"issue",amount:29000,manager:"Вера",completion:"none"},
+{name:"Виктор Щ.",type:"Внешний",company:"«Летуаль»",status:"paid",amount:20000,manager:"Вера",completion:"none"},
+{name:"Годунов Ден.",type:"Внешний",company:"ИП Годунов",status:"paid",amount:25840,manager:"Вера",completion:"none"},
+{name:"Годунов Дм.",type:"Внешний",company:"ИП Годунов",status:"paid",amount:25840,manager:"Вера",completion:"none"},
+{name:"Голикова А.И.",type:"Внешний",company:"ООО «Цимус»",status:"paid",amount:32300,manager:"Вера (лид Нади)",completion:"cert"},
+{name:"Маренич И.В.",type:"Внешний",company:"Физ. лицо",status:"issue",amount:25000,manager:"Вера",completion:"none"}
+];
+
+const surveyRaw = [
+["МК1 Погружение в AI",3,3,10,5,3,"Не рассказывать а показывать на примерах",""],
+["МК1 Погружение в AI",8,8,9,10,10,"Все отлично!",""],
+["МК1 Погружение в AI",10,10,10,10,10,"Надежда, огромное спасибо!","Оксана П."],
+["МК1 Погружение в AI",10,10,10,6,10,"Пожеланий нет. Первый урок вводный, думаю следующие знания будут более полезными для меня.",""],
+["МК1 Погружение в AI",10,10,10,8,10,"Так как встреча вводная и рассчитана на пользователей с разными исходными знаниями, большая часть инфо была знакома, но взяла на заметку некоторые фишечки.",""],
+["МК1 Погружение в AI",9,9,10,10,10,"Пожелание одно — больше практики. Теория это хорошо, но на практике всё запоминается гораздо лучше.",""],
+["МК1 Погружение в AI",10,10,10,10,10,"Продолжайте в том же духе","Дмитрий К."],
+["МК1 Погружение в AI",9,10,9,10,10,"Очень много информации, огромное желание разобраться до молекул","Alina P."],
+["МК1 Погружение в AI",10,10,10,10,10,"Пока сложно сформировать.","Шеина А.В."],
+["МК1 Погружение в AI",9,10,9,9,10,"Все нормально, нужно использовать и практиковаться","Годунов Д."],
+["МК1 Погружение в AI",10,10,10,10,10,"Надежда, большое спасибо Вам! Всё понятно, иду подключать платные подписки)","Новоселова А.Т."],
+["МК1 Погружение в AI",5,8,9,8,7,"Больше практики и попроще)",""],
+["МК1 Погружение в AI",10,10,10,10,10,"Надя, ты супер! Очень интересно. Тяжеловато в плане 2,5 часов, под конец мозг закипает. Спасибо!","Китюха А.С."],
+["МК1 Погружение в AI",10,8,10,9,10,"Все понравилось)",""],
+["МК1 Погружение в AI",8,8,9,9,8,"Важно больше примеров, важна навигация, чтоб после урока легче было перейти к применению","Денис Г."],
+["МК1 Погружение в AI",7,4,5,5,4,"Галопом по европам, на скорости х4 — это, это, это и это. Без понимания как аудитория поняла информацию.",""],
+["МК1 Погружение в AI",10,9,10,10,10,"Большое спасибо, что уделяете внимание и учитываете, что есть новички. Очень полезно и интересно.",""],
+["МК1 Погружение в AI",10,10,10,10,10,"Скорее не по теме тренинга: только вхожу в профессию ассистента, работодатель предложил переквалифицироваться.","Анна К."],
+["МК1 Погружение в AI",10,10,10,10,10,"Больше внимания к использованию на МП","Русских Д."],
+["МК1 Погружение в AI",10,10,10,10,10,"Полезная информация на все 100%","Пронина О.М."],
+["МК2 Cowork и AI-агенты",10,10,9,9,9,"На этот раз было много полезного и применимого на практике, но не весь материал удалось продемонстрировать лектору",""],
+["МК2 Cowork и AI-агенты",10,10,10,10,10,"Было очень здорово открыть для себя коворк",""],
+["МК2 Cowork и AI-агенты",10,10,10,null,10,"Важно на практике показать, как работать с протоколами и создавать код для работы с папками и сайтами",""],
+["МК2 Cowork и AI-агенты",10,10,10,10,10,"Все понравилось","Амплеева А.А."],
+["МК2 Cowork и AI-агенты",10,10,10,8,10,"Для меня сложновато прям, так как Клауд не оплатила и в моменте не могла потыкать руками.","Китюха А.С."],
+["МК2 Cowork и AI-агенты",10,10,10,10,10,"Спасибо, всё подробно. Буду ещё пересматривать)","Новоселова О."],
+["МК2 Cowork и AI-агенты",10,10,10,10,10,"Пока комментариев нет. Вникаю :)","Анна К."],
+["МК2 Cowork и AI-агенты",6,7,7,7,7,"На моменте когда начали работать с коворком было впечатление хаоса, буду пересматривать. Практика в процессе — неудобна.",""],
+["МК2 Cowork и AI-агенты",9,10,10,10,10,"Ценная, полезная, применимая практика. Спасибо большое.","Денис Г."],
+["МК2 Cowork и AI-агенты",10,10,10,10,10,"Все отлично! Очень системно","Голикова А.И."],
+["МК2 Cowork и AI-агенты",10,10,10,10,10,"Есть над чем подумать опытным юзерам",""],
+["МК3 Презентации, чек-листы, дашборды",10,10,10,8,10,"Все понравилось, модуль был содержательным и полезным",""],
+["МК3 Презентации, чек-листы, дашборды",10,10,10,8,10,"Пока нет.","Шеина А."],
+["МК3 Презентации, чек-листы, дашборды",9,9,9,9,9,"Все актуально","Годунов Д.Б."],
+["МК3 Презентации, чек-листы, дашборды",10,10,10,10,10,"Все отлично! Спасибо!","Голикова А.И."],
+["МК4 Notion: база знаний компании",10,10,10,10,10,"Супер, много нового )",""],
+["МК4 Notion: база знаний компании",10,10,10,10,10,"Все бесконечно нравится!","Амплеева А."],
+["МК4 Notion: база знаний компании",10,9,10,10,10,"NotebookLM прям открытие! Спасибо) Obsidian пока не очень поняла насколько полезно будет.","Фикс Д."],
+["МК4 Notion: база знаний компании",10,10,10,10,10,"Спасибо, Надежда! Мне всё понятно. Много новых полезных инструментов","Новоселова О."],
+["МК4 Notion: база знаний компании",10,10,10,10,9,"Кусочно вникаю, но всё доступно по подаче","Анна К."],
+["МК4 Notion: база знаний компании",10,10,10,10,10,"Все отлично, информативно!","Голикова А.И."],
+["МК5 Защита: AI-рабочий день ассистента",10,10,10,10,10,"Невероятно полезный опыт, который делает работу намного быстрее и легче.","Амплеева А."],
+["МК5 Защита: AI-рабочий день ассистента",10,10,10,10,10,"Для меня этот курс как заложенный фундамент, построенное здание с возможностью перестраивать.","Шеин А.В."],
+["МК5 Защита: AI-рабочий день ассистента",10,10,10,10,10,"Все отлично! Было интересно посмотреть на кейсы участников курса, зарядилась новыми идеями.",""],
+["МК5 Защита: AI-рабочий день ассистента",10,10,10,10,10,"Очень классно! Все легко и понятно! Для новичков вообще кладезь информации","Исакова О."],
+["МК5 Защита: AI-рабочий день ассистента",10,10,10,10,10,"Все отлично!","Голикова А.И."],
+["МК5 Защита: AI-рабочий день ассистента",9,9,10,9,9,"Все прошло хорошо, личный опыт Надежды очень ценен для меня. Спасибо","Годунов Д."],
+["МК5 Защита: AI-рабочий день ассистента",10,10,10,10,10,"Все отлично! Было интересно посмотреть на кейсы участников курса, зарядилась новыми идеями.",""]
+];
+const survey = surveyRaw.map(r=>({module:r[0],q1:r[1],q2:r[2],q3:r[3],q4:r[4],q5:r[5],comment:r[6],who:r[7]}));
+const modules = ["МК1 Погружение в AI","МК2 Cowork и AI-агенты","МК3 Презентации, чек-листы, дашборды","МК4 Notion: база знаний компании","МК5 Защита: AI-рабочий день ассистента"];
+const modShort = {"МК1 Погружение в AI":"МК1","МК2 Cowork и AI-агенты":"МК2","МК3 Презентации, чек-листы, дашборды":"МК3","МК4 Notion: база знаний компании":"МК4","МК5 Защита: AI-рабочий день ассистента":"МК5"};
+
+/* ================= HELPERS ================= */
+const avg = arr => { const v = arr.filter(x=>x!==null && x!==undefined); return v.length? v.reduce((a,b)=>a+b,0)/v.length : 0; };
+const calcNPS = arr => {
+  const v = arr.filter(x=>x!==null && x!==undefined);
+  if(!v.length) return 0;
+  const promoters = v.filter(x=>x>=9).length;
+  const detractors = v.filter(x=>x<=6).length;
+  return ((promoters - detractors) / v.length) * 100;
+};
+const fmtMoney = n => n.toLocaleString('ru-RU');
+
+/* ================= KPIs ================= */
+const totalRevenue = clients.reduce((s,c)=>s+c.amount,0);
+const revenueNoVat = 889155.54;
+const totalParticipants = clients.length;
+const paidCount = clients.filter(c=>c.status==="paid").length;
+const issueCount = clients.filter(c=>c.status==="issue").length;
+const overallNPS = calcNPS(survey.map(s=>s.q5));
+
+document.getElementById('heroRevenue').textContent = revenueNoVat.toLocaleString('ru-RU',{minimumFractionDigits:2, maximumFractionDigits:2});
+document.getElementById('heroNPS').textContent = overallNPS.toFixed(0) + "%";
+document.getElementById('heroParticipants').textContent = totalParticipants;
+
+const kpis = [
+  {val:revenueNoVat.toLocaleString('ru-RU',{minimumFractionDigits:2, maximumFractionDigits:2})+" ₽", lbl:"Выручка без НДС", cls:""},
+  {val:fmtMoney(totalRevenue)+" ₽", lbl:"Выручка с НДС (для справки)", cls:""},
+  {val:survey.length, lbl:"Ответов в опросе (из "+totalParticipants+" участников)", cls:""},
+];
+document.getElementById('kpiRow').innerHTML = kpis.map(k=>`
+  <div class="kpi ${k.cls}"><div class="val">${k.val}</div><div class="lbl">${k.lbl}</div></div>
+`).join("");
+
+document.getElementById('clientsNote').textContent = `${totalParticipants} строк · выручка ${fmtMoney(totalRevenue)} ₽`;
+document.getElementById('commentsNote').textContent = `${survey.length} ответов из ${totalParticipants} участников`;
+
+/* ================= STAIRCASE ================= */
+const staircase = document.getElementById('staircase');
+const maxH = 170;
+staircase.innerHTML = modules.map(m=>{
+  const rows = survey.filter(s=>s.module===m);
+  const nps = calcNPS(rows.map(r=>r.q5));
+  const h = Math.max(24, ((nps+100)/200) * maxH);
+  return `<div class="step">
+    <div class="bar" style="height:${h}px"><div class="score">${nps.toFixed(0)}%</div></div>
+    <div class="name">${modShort[m]}</div>
+    <div class="n">n=${rows.length}</div>
+  </div>`;
+}).join("");
+
+/* ================= CLIENT TABLE + FILTERS ================= */
+let clientFilter = {manager:"all", status:"all"};
+const managers = ["all", ...new Set(clients.map(c=>c.manager))];
+
+function renderClientFilters(){
+  const statusLabels = {all:"Все статусы",paid:"Оплачено",issue:"Уточняется"};
+  const html = `
+    ${Object.keys(statusLabels).map(s=>`<button data-f="status" data-v="${s}" class="${clientFilter.status===s?'active':''}">${statusLabels[s]}</button>`).join("")}
+  `;
+  document.getElementById('clientFilters').innerHTML = html;
+  document.querySelectorAll('#clientFilters button').forEach(b=>{
+    b.onclick = ()=>{ clientFilter.status = b.dataset.v; renderClientFilters(); renderClientTable(); };
+  });
+}
+function renderClientTable(){
+  const rows = clients.filter(c=> clientFilter.status==="all" || c.status===clientFilter.status);
+  const statusBadge = {paid:'<span class="badge paid">оплачено</span>',issue:'<span class="badge issue">уточняется</span>',internal:'<span class="badge internal">внутренний</span>'};
+  const compBadge = c => c.completion==="cert" ? '<span class="badge cert">сертификат</span>' : '<span class="badge none">не сдан проект</span>';
+  document.querySelector('#clientTable tbody').innerHTML = rows.map(c=>`
+    <tr>
+      <td>${c.name}</td>
+      <td>${c.company}</td>
+      <td>${c.amount? fmtMoney(c.amount)+" ₽" : "—"}</td>
+      <td>${statusBadge[c.status]}</td>
+      <td>${compBadge(c)}</td>
+    </tr>
+  `).join("");
+}
+renderClientFilters(); renderClientTable();
+
+/* ================= CHARTS ================= */
+Chart.defaults.color = "#9099c0";
+Chart.defaults.font.family = "Inter";
+Chart.defaults.borderColor = "#2a3363";
+
+const statusCounts = {paid:paidCount, issue:issueCount};
+new Chart(document.getElementById('paymentStatus'), {
+  type:'doughnut',
+  data:{ labels:["Оплачено","Уточняется"], datasets:[{data:[statusCounts.paid,statusCounts.issue], backgroundColor:["#6fbf9e","#e2687a"], borderWidth:0}]},
+  options:{ plugins:{legend:{position:'bottom', labels:{boxWidth:10,padding:14,font:{size:11}}}}, responsive:true, maintainAspectRatio:false, cutout:"62%" }
+});
+
+const critLabels = [
+  "Актуальность, структура, достаточность",
+  "Применимость на практике",
+  "Работа тренера",
+  "Польза участия"
+];
+const critKeys = ["q1","q2","q3","q4"];
+const critColors = ["#e8a33d","#6fbf9e","#7fa8e0","#c9a3e8"];
+new Chart(document.getElementById('moduleScores'), {
+  type:'line',
+  data:{
+    labels: modules.map(m=>modShort[m]),
+    datasets: critKeys.map((k,i)=>({
+      label: critLabels[i],
+      data: modules.map(m=> avg(survey.filter(s=>s.module===m).map(s=>s[k]))),
+      borderColor: critColors[i],
+      backgroundColor: critColors[i],
+      tension:0.35,
+      pointRadius:4,
+      borderWidth:2
+    }))
+  },
+  options:{ scales:{ y:{min:0,max:10,grid:{color:"#232a52"}}, x:{grid:{display:false}} }, plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:14,font:{size:11}}}}, responsive:true, maintainAspectRatio:false }
+});
+
+new Chart(document.getElementById('npsChart'), {
+  type:'bar',
+  data:{
+    labels: modules.map(m=>modShort[m]),
+    datasets:[{
+      label:"NPS, %",
+      data: modules.map(m=> calcNPS(survey.filter(s=>s.module===m).map(s=>s.q5))),
+      backgroundColor: "#e8a33d",
+      borderRadius:6
+    }]
+  },
+  options:{
+    scales:{ y:{min:-100,max:100,grid:{color:"#232a52"},ticks:{callback:v=>v+"%"}}, x:{grid:{display:false}} },
+    plugins:{legend:{display:false}},
+    responsive:true, maintainAspectRatio:false
+  }
+});
+
+/* ================= COMMENTS ================= */
+let commentFilter = {module:"all", lowOnly:false};
+function renderCommentFilters(){
+  let html = `<button data-m="all" class="${commentFilter.module==='all'?'active':''}">Все модули</button>`;
+  modules.forEach(m=> html += `<button data-m="${m}" class="${commentFilter.module===m?'active':''}">${modShort[m]}</button>`);
+  html += `<button id="lowToggle" class="${commentFilter.lowOnly?'active':''}">Только оценки ниже 7</button>`;
+  document.getElementById('commentFilters').innerHTML = html;
+  document.querySelectorAll('#commentFilters button[data-m]').forEach(b=>{
+    b.onclick = ()=>{ commentFilter.module = b.dataset.m; renderCommentFilters(); renderComments(); };
+  });
+  document.getElementById('lowToggle').onclick = ()=>{ commentFilter.lowOnly = !commentFilter.lowOnly; renderCommentFilters(); renderComments(); };
+}
+function renderComments(){
+  let rows = survey.filter(s=> commentFilter.module==="all" || s.module===commentFilter.module);
+  if(commentFilter.lowOnly) rows = rows.filter(s=> s.q5!==null && s.q5<7);
+  document.getElementById('commentsList').innerHTML = rows.map(s=>`
+    <div class="comment">
+      <div class="meta">
+        <span>${modShort[s.module]}</span>
+        <span class="score ${s.q5!==null && s.q5<7 ? 'low':''}">NPS ${s.q5 ?? "—"}</span>
+      </div>
+      <p>${s.comment || "<i>без комментария</i>"}</p>
+      ${s.who ? `<div class="who">${s.who}</div>` : ""}
+    </div>
+  `).join("") || "<p style='color:var(--muted)'>Нет комментариев по выбранным фильтрам.</p>";
+}
+renderCommentFilters(); renderComments();
+</script>
+</body>
+</html>
