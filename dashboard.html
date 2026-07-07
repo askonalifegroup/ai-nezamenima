@@ -130,13 +130,13 @@ footer{text-align:center;color:var(--muted-2);font-size:12px;margin-top:60px;}
     <div>
       <div class="eyebrow">Корпоративный университет · ALG</div>
       <h1>AI-НЕЗАМЕНИМА<br>итоги курса для ассистентов</h1>
-      <p class="sub">5 модулей, 48 ответов обратной связи и 39 внешних участников — от первого погружения в AI до защиты собственного AI-рабочего дня.</p>
+      <p class="sub">5 модулей, 48 ответов обратной связи и <span id="participantsSummary">39 внешних участников</span> — от первого погружения в AI до защиты собственного AI-рабочего дня.</p>
       <div id="syncStatus">Загружаю актуальные данные из Google Таблиц…</div>
     </div>
     <div class="hero-stats">
       <div class="hero-stat"><div class="num" id="heroRevenue">—</div><div class="lbl">выручка без НДС, ₽</div></div>
       <div class="hero-stat"><div class="num" id="heroNPS">—</div><div class="lbl">средний NPS</div></div>
-      <div class="hero-stat"><div class="num" id="heroParticipants">—</div><div class="lbl">участников</div></div>
+      <div class="hero-stat"><div class="num" id="heroParticipants">—</div><div class="lbl">участников всего</div></div>
     </div>
   </div>
 
@@ -374,19 +374,21 @@ function renderDashboard(clients, survey, internalCount){
   const totalRevenue = clients.reduce((s,c)=>s+c.amount,0);
   const revenueNoVat = totalRevenue * 0.78; // НДС 22%: выручка минус 22%
   const totalParticipants = clients.length;
+  const totalAll = totalParticipants + internalCount;
   const paidCount = clients.filter(c=>c.status==="paid").length;
   const issueCount = clients.filter(c=>c.status==="issue").length;
   const overallNPS = calcNPS(survey.map(s=>s.q5));
 
   document.getElementById('heroRevenue').textContent = revenueNoVat.toLocaleString('ru-RU',{minimumFractionDigits:2, maximumFractionDigits:2});
   document.getElementById('heroNPS').textContent = overallNPS.toFixed(0) + "%";
-  document.getElementById('heroParticipants').textContent = totalParticipants;
+  document.getElementById('heroParticipants').textContent = totalAll;
+  document.getElementById('participantsSummary').textContent = `${totalAll} участников (${totalParticipants} внешних + ${internalCount} внутренних)`;
 
   const kpis = [
     {val:revenueNoVat.toLocaleString('ru-RU',{minimumFractionDigits:2, maximumFractionDigits:2})+" ₽", lbl:"Выручка без НДС (ставка 22%)", cls:""},
     {val:fmtMoney(totalRevenue)+" ₽", lbl:"Выручка с НДС (для справки)", cls:""},
     {val:survey.length, lbl:"Всего ответов в опросе", cls:""},
-    {val:internalCount, lbl:"Внутренних студентов (сотрудники Askona)", cls:""},
+    {val:`${totalParticipants} / ${internalCount}`, lbl:"Внешних / внутренних участников", cls:""},
   ];
   document.getElementById('kpiRow').innerHTML = kpis.map(k=>`
     <div class="kpi ${k.cls}"><div class="val">${k.val}</div><div class="lbl">${k.lbl}</div></div>
