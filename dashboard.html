@@ -112,6 +112,11 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .insight .tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.04em;color:var(--muted);border:1px solid var(--card-border);border-radius:20px;padding:4px 10px;}
 
 footer{text-align:center;color:var(--muted-2);font-size:12px;margin-top:60px;}
+
+#syncStatus{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);margin-top:4px;}
+#syncStatus.error{color:var(--rose);}
+#loadingOverlay{display:flex;align-items:center;justify-content:center;min-height:300px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:14px;}
+.hidden{display:none !important;}
 </style>
 </head>
 <body>
@@ -122,6 +127,7 @@ footer{text-align:center;color:var(--muted-2);font-size:12px;margin-top:60px;}
       <div class="eyebrow">Корпоративный университет · ALG</div>
       <h1>AI-НЕЗАМЕНИМА<br>итоги курса для ассистентов</h1>
       <p class="sub">5 модулей, 48 ответов обратной связи и 39 внешних участников — от первого погружения в AI до защиты собственного AI-рабочего дня.</p>
+      <div id="syncStatus">Загружаю актуальные данные из Google Таблиц…</div>
     </div>
     <div class="hero-stats">
       <div class="hero-stat"><div class="num" id="heroRevenue">—</div><div class="lbl">выручка без НДС, ₽</div></div>
@@ -129,6 +135,9 @@ footer{text-align:center;color:var(--muted-2);font-size:12px;margin-top:60px;}
       <div class="hero-stat"><div class="num" id="heroParticipants">—</div><div class="lbl">участников</div></div>
     </div>
   </div>
+
+  <div id="loadingOverlay">Загружаю данные…</div>
+  <div id="dashboardBody" class="hidden">
 
   <div class="kpis" id="kpiRow"></div>
 
@@ -226,108 +235,17 @@ footer{text-align:center;color:var(--muted-2);font-size:12px;margin-top:60px;}
     </div>
   </section>
 
+  </div>
+
   <footer>Дашборд собран автоматически из данных Google Таблиц · курс «AI-НЕЗАМЕНИМА»</footer>
 </div>
 
 <script>
-/* ================= DATA ================= */
-const clients = [
-{name:"Горохов В.В.",type:"Внешний",company:"ИП Горохов (розница)",status:"paid",amount:32300,manager:"Вера",completion:"none"},
-{name:"Сергиенко А.В.",type:"Внешний",company:"Барс Консалт",status:"paid",amount:32300,manager:"Вера",completion:"cert"},
-{name:"Ширингина Ю.О.",type:"Внешний",company:"ООО «Невидимые решётки»",status:"paid",amount:25194,manager:"Вера",completion:"none"},
-{name:"Борисочкина К.В.",type:"Внешний",company:"ООО «Невидимые решётки»",status:"paid",amount:25194,manager:"Вера",completion:"none"},
-{name:"Китюха А.С.",type:"Внешний",company:"Другие миры",status:"paid",amount:32300,manager:"Ира",completion:"none"},
-{name:"Исакова О.Е.",type:"Внешний",company:"Физ. лицо",status:"issue",amount:32300,manager:"Ира",completion:"cert"},
-{name:"Специан Н.",type:"Внешний",company:"АНО ДПО «Академия ТОП»",status:"paid",amount:109820,manager:"Ира",completion:"none"},
-{name:"Новоселова О.",type:"Внешний",company:"АНО ДПО «Академия ТОП»",status:"paid",amount:0,manager:"Ира",completion:"cert"},
-{name:"Сергеева А.",type:"Внешний",company:"АНО ДПО «Академия ТОП»",status:"paid",amount:0,manager:"Ира",completion:"cert"},
-{name:"Бабурян Р.",type:"Внешний",company:"АНО ДПО «Академия ТОП»",status:"paid",amount:0,manager:"Ира",completion:"none"},
-{name:"Лабзина О.А.",type:"Внешний",company:"ООО «Сокол-Т»",status:"paid",amount:32300,manager:"Ира",completion:"none"},
-{name:"Андрей Ш.",type:"Внешний",company:"ООО «Мониторинг-Сервис»",status:"paid",amount:32300,manager:"Вера",completion:"cert"},
-{name:"Камалова К.Р.",type:"Внешний",company:"«Телематика-сервис» (ЮМС)",status:"paid",amount:32300,manager:"—",completion:"none"},
-{name:"Дарья Ф.",type:"Внешний",company:"ИП Романов РР",status:"paid",amount:32300,manager:"Вера",completion:"cert"},
-{name:"Бычина К.В.",type:"Внешний",company:"ИП Унжакова Вероника",status:"paid",amount:32300,manager:"Вера",completion:"none"},
-{name:"Емельянова Н.А.",type:"Внешний",company:"Би Смарт",status:"paid",amount:32300,manager:"Вера",completion:"none"},
-{name:"Каплан Е.Р.",type:"Внешний",company:"Амбитика Медиа Плюс",status:"paid",amount:27455,manager:"Вера",completion:"none"},
-{name:"Азаренков К.А.",type:"Внешний",company:"Амбитика Медиа Плюс",status:"paid",amount:27455,manager:"Вера",completion:"none"},
-{name:"Элькина П.М.",type:"Внешний",company:"Амбитика Медиа Плюс",status:"paid",amount:27455,manager:"Вера",completion:"none"},
-{name:"Комина Е.М.",type:"Внешний",company:"Амбитика Медиа Плюс",status:"paid",amount:27455,manager:"Вера",completion:"none"},
-{name:"Ижболдина П.Г.",type:"Внешний",company:"Амбитика Медиа Плюс",status:"paid",amount:27455,manager:"Вера",completion:"cert"},
-{name:"Юлия Л.",type:"Внешний",company:"ООО «Премьера»",status:"paid",amount:32300,manager:"Вера",completion:"cert"},
-{name:"Веселова Ю.В.",type:"Внешний",company:"ООО «Кант»",status:"paid",amount:32300,manager:"Вера",completion:"none"},
-{name:"Елисеева Е.С.",type:"Внешний",company:"ООО «Первая Розничная компания»",status:"paid",amount:32300,manager:"Вера",completion:"none"},
-{name:"Пинчина А.Д.",type:"Внешний",company:"ООО «Первая Розничная компания»",status:"paid",amount:32300,manager:"Вера",completion:"cert"},
-{name:"Касьянов А.",type:"Внешний",company:"Физ. лицо",status:"paid",amount:29000,manager:"Ира",completion:"cert"},
-{name:"Гиганова С.",type:"Внешний",company:"«Ветер востока»",status:"issue",amount:29000,manager:"Ира",completion:"none"},
-{name:"Кременец Е.А.",type:"Внешний",company:"КВ Системы",status:"paid",amount:32300,manager:"Вера",completion:"none"},
-{name:"Дмитрий Р.",type:"Внешний",company:"ИП Русских А.Н.",status:"paid",amount:32300,manager:"Вера",completion:"none"},
-{name:"Долинина О.",type:"Внешний",company:"ООО «Крем-шоп»",status:"paid",amount:25840,manager:"Вера",completion:"cert"},
-{name:"Керчелаева А.",type:"Внешний",company:"ООО «Крем-шоп»",status:"paid",amount:25840,manager:"Вера",completion:"cert"},
-{name:"Рудяков Г.",type:"Внешний",company:"«Летуаль»",status:"paid",amount:29000,manager:"Вера",completion:"none"},
-{name:"Ольга Ф.",type:"Внешний",company:"«Летуаль»",status:"paid",amount:29000,manager:"Вера",completion:"none"},
-{name:"Комосов Д.Ю.",type:"Внешний",company:"«Летуаль» / физ.лицо",status:"issue",amount:29000,manager:"Вера",completion:"none"},
-{name:"Виктор Щ.",type:"Внешний",company:"«Летуаль»",status:"paid",amount:20000,manager:"Вера",completion:"none"},
-{name:"Годунов Ден.",type:"Внешний",company:"ИП Годунов",status:"paid",amount:25840,manager:"Вера",completion:"none"},
-{name:"Годунов Дм.",type:"Внешний",company:"ИП Годунов",status:"paid",amount:25840,manager:"Вера",completion:"none"},
-{name:"Голикова А.И.",type:"Внешний",company:"ООО «Цимус»",status:"paid",amount:32300,manager:"Вера (лид Нади)",completion:"cert"},
-{name:"Маренич И.В.",type:"Внешний",company:"Физ. лицо",status:"issue",amount:25000,manager:"Вера",completion:"none"}
-];
+/* ================= ИСТОЧНИКИ ДАННЫХ ================= */
+const CLIENTS_API = "https://script.google.com/macros/s/AKfycbxZVICbaAVW2llSaQe1gQCJOjszix5HCXSnNYXinOCr72RoGHEaqTQWz8Zetje2SGYJ1w/exec";
+const SURVEY_API = "https://script.google.com/macros/s/AKfycbxZTUbIMTNTZMbXnLyesfZTSr0p4ku9f4wJIDqAZrExdFcvREk7sHlfDD4D2UUU-qY1/exec";
 
-const surveyRaw = [
-["МК1 Погружение в AI",3,3,10,5,3,"Не рассказывать а показывать на примерах",""],
-["МК1 Погружение в AI",8,8,9,10,10,"Все отлично!",""],
-["МК1 Погружение в AI",10,10,10,10,10,"Надежда, огромное спасибо!","Оксана П."],
-["МК1 Погружение в AI",10,10,10,6,10,"Пожеланий нет. Первый урок вводный, думаю следующие знания будут более полезными для меня.",""],
-["МК1 Погружение в AI",10,10,10,8,10,"Так как встреча вводная и рассчитана на пользователей с разными исходными знаниями, большая часть инфо была знакома, но взяла на заметку некоторые фишечки.",""],
-["МК1 Погружение в AI",9,9,10,10,10,"Пожелание одно — больше практики. Теория это хорошо, но на практике всё запоминается гораздо лучше.",""],
-["МК1 Погружение в AI",10,10,10,10,10,"Продолжайте в том же духе","Дмитрий К."],
-["МК1 Погружение в AI",9,10,9,10,10,"Очень много информации, огромное желание разобраться до молекул","Alina P."],
-["МК1 Погружение в AI",10,10,10,10,10,"Пока сложно сформировать.","Шеина А.В."],
-["МК1 Погружение в AI",9,10,9,9,10,"Все нормально, нужно использовать и практиковаться","Годунов Д."],
-["МК1 Погружение в AI",10,10,10,10,10,"Надежда, большое спасибо Вам! Всё понятно, иду подключать платные подписки)","Новоселова А.Т."],
-["МК1 Погружение в AI",5,8,9,8,7,"Больше практики и попроще)",""],
-["МК1 Погружение в AI",10,10,10,10,10,"Надя, ты супер! Очень интересно. Тяжеловато в плане 2,5 часов, под конец мозг закипает. Спасибо!","Китюха А.С."],
-["МК1 Погружение в AI",10,8,10,9,10,"Все понравилось)",""],
-["МК1 Погружение в AI",8,8,9,9,8,"Важно больше примеров, важна навигация, чтоб после урока легче было перейти к применению","Денис Г."],
-["МК1 Погружение в AI",7,4,5,5,4,"Галопом по европам, на скорости х4 — это, это, это и это. Без понимания как аудитория поняла информацию.",""],
-["МК1 Погружение в AI",10,9,10,10,10,"Большое спасибо, что уделяете внимание и учитываете, что есть новички. Очень полезно и интересно.",""],
-["МК1 Погружение в AI",10,10,10,10,10,"Скорее не по теме тренинга: только вхожу в профессию ассистента, работодатель предложил переквалифицироваться.","Анна К."],
-["МК1 Погружение в AI",10,10,10,10,10,"Больше внимания к использованию на МП","Русских Д."],
-["МК1 Погружение в AI",10,10,10,10,10,"Полезная информация на все 100%","Пронина О.М."],
-["МК2 Cowork и AI-агенты",10,10,9,9,9,"На этот раз было много полезного и применимого на практике, но не весь материал удалось продемонстрировать лектору",""],
-["МК2 Cowork и AI-агенты",10,10,10,10,10,"Было очень здорово открыть для себя коворк",""],
-["МК2 Cowork и AI-агенты",10,10,10,null,10,"Важно на практике показать, как работать с протоколами и создавать код для работы с папками и сайтами",""],
-["МК2 Cowork и AI-агенты",10,10,10,10,10,"Все понравилось","Амплеева А.А."],
-["МК2 Cowork и AI-агенты",10,10,10,8,10,"Для меня сложновато прям, так как Клауд не оплатила и в моменте не могла потыкать руками.","Китюха А.С."],
-["МК2 Cowork и AI-агенты",10,10,10,10,10,"Спасибо, всё подробно. Буду ещё пересматривать)","Новоселова О."],
-["МК2 Cowork и AI-агенты",10,10,10,10,10,"Пока комментариев нет. Вникаю :)","Анна К."],
-["МК2 Cowork и AI-агенты",6,7,7,7,7,"На моменте когда начали работать с коворком было впечатление хаоса, буду пересматривать. Практика в процессе — неудобна.",""],
-["МК2 Cowork и AI-агенты",9,10,10,10,10,"Ценная, полезная, применимая практика. Спасибо большое.","Денис Г."],
-["МК2 Cowork и AI-агенты",10,10,10,10,10,"Все отлично! Очень системно","Голикова А.И."],
-["МК2 Cowork и AI-агенты",10,10,10,10,10,"Есть над чем подумать опытным юзерам",""],
-["МК3 Презентации, чек-листы, дашборды",10,10,10,8,10,"Все понравилось, модуль был содержательным и полезным",""],
-["МК3 Презентации, чек-листы, дашборды",10,10,10,8,10,"Пока нет.","Шеина А."],
-["МК3 Презентации, чек-листы, дашборды",9,9,9,9,9,"Все актуально","Годунов Д.Б."],
-["МК3 Презентации, чек-листы, дашборды",10,10,10,10,10,"Все отлично! Спасибо!","Голикова А.И."],
-["МК4 Notion: база знаний компании",10,10,10,10,10,"Супер, много нового )",""],
-["МК4 Notion: база знаний компании",10,10,10,10,10,"Все бесконечно нравится!","Амплеева А."],
-["МК4 Notion: база знаний компании",10,9,10,10,10,"NotebookLM прям открытие! Спасибо) Obsidian пока не очень поняла насколько полезно будет.","Фикс Д."],
-["МК4 Notion: база знаний компании",10,10,10,10,10,"Спасибо, Надежда! Мне всё понятно. Много новых полезных инструментов","Новоселова О."],
-["МК4 Notion: база знаний компании",10,10,10,10,9,"Кусочно вникаю, но всё доступно по подаче","Анна К."],
-["МК4 Notion: база знаний компании",10,10,10,10,10,"Все отлично, информативно!","Голикова А.И."],
-["МК5 Защита: AI-рабочий день ассистента",10,10,10,10,10,"Невероятно полезный опыт, который делает работу намного быстрее и легче.","Амплеева А."],
-["МК5 Защита: AI-рабочий день ассистента",10,10,10,10,10,"Для меня этот курс как заложенный фундамент, построенное здание с возможностью перестраивать.","Шеин А.В."],
-["МК5 Защита: AI-рабочий день ассистента",10,10,10,10,10,"Все отлично! Было интересно посмотреть на кейсы участников курса, зарядилась новыми идеями.",""],
-["МК5 Защита: AI-рабочий день ассистента",10,10,10,10,10,"Очень классно! Все легко и понятно! Для новичков вообще кладезь информации","Исакова О."],
-["МК5 Защита: AI-рабочий день ассистента",10,10,10,10,10,"Все отлично!","Голикова А.И."],
-["МК5 Защита: AI-рабочий день ассистента",9,9,10,9,9,"Все прошло хорошо, личный опыт Надежды очень ценен для меня. Спасибо","Годунов Д."],
-["МК5 Защита: AI-рабочий день ассистента",10,10,10,10,10,"Все отлично! Было интересно посмотреть на кейсы участников курса, зарядилась новыми идеями.",""]
-];
-const survey = surveyRaw.map(r=>({module:r[0],q1:r[1],q2:r[2],q3:r[3],q4:r[4],q5:r[5],comment:r[6],who:r[7]}));
-const modules = ["МК1 Погружение в AI","МК2 Cowork и AI-агенты","МК3 Презентации, чек-листы, дашборды","МК4 Notion: база знаний компании","МК5 Защита: AI-рабочий день ассистента"];
-const modShort = {"МК1 Погружение в AI":"МК1","МК2 Cowork и AI-агенты":"МК2","МК3 Презентации, чек-листы, дашборды":"МК3","МК4 Notion: база знаний компании":"МК4","МК5 Защита: AI-рабочий день ассистента":"МК5"};
-
-/* ================= HELPERS ================= */
+/* ================= ХЕЛПЕРЫ ================= */
 const avg = arr => { const v = arr.filter(x=>x!==null && x!==undefined); return v.length? v.reduce((a,b)=>a+b,0)/v.length : 0; };
 const calcNPS = arr => {
   const v = arr.filter(x=>x!==null && x!==undefined);
@@ -338,156 +256,214 @@ const calcNPS = arr => {
 };
 const fmtMoney = n => n.toLocaleString('ru-RU');
 
-/* ================= KPIs ================= */
-const totalRevenue = clients.reduce((s,c)=>s+c.amount,0);
-const revenueNoVat = 889155.54;
-const totalParticipants = clients.length;
-const paidCount = clients.filter(c=>c.status==="paid").length;
-const issueCount = clients.filter(c=>c.status==="issue").length;
-const overallNPS = calcNPS(survey.map(s=>s.q5));
+/* ================= НОРМАЛИЗАЦИЯ ДАННЫХ ИЗ ТАБЛИЦ ================= */
+function classifyClient(raw){
+  const statusRaw = (raw.status_raw || '').toLowerCase();
+  let status;
+  if (raw.contour === 'Внутренний') status = 'internal';
+  else if (statusRaw.indexOf('направил') !== -1) status = 'excluded'; // отдельная сделка, не участник курса
+  else if (statusRaw.indexOf('оплач') !== -1) status = 'paid';
+  else if (statusRaw.indexOf('уточн') !== -1 || statusRaw.indexOf('нет информ') !== -1 || statusRaw.indexOf('нет в эдо') !== -1) status = 'issue';
+  else status = raw.amount > 0 ? 'paid' : 'issue';
 
-document.getElementById('heroRevenue').textContent = revenueNoVat.toLocaleString('ru-RU',{minimumFractionDigits:2, maximumFractionDigits:2});
-document.getElementById('heroNPS').textContent = overallNPS.toFixed(0) + "%";
-document.getElementById('heroParticipants').textContent = totalParticipants;
+  const completion = (raw.completion_raw || '').toLowerCase().indexOf('сертификат') !== -1 ? 'cert' : 'none';
 
-const kpis = [
-  {val:revenueNoVat.toLocaleString('ru-RU',{minimumFractionDigits:2, maximumFractionDigits:2})+" ₽", lbl:"Выручка без НДС", cls:""},
-  {val:fmtMoney(totalRevenue)+" ₽", lbl:"Выручка с НДС (для справки)", cls:""},
-  {val:survey.length, lbl:"Ответов в опросе (из "+totalParticipants+" участников)", cls:""},
-];
-document.getElementById('kpiRow').innerHTML = kpis.map(k=>`
-  <div class="kpi ${k.cls}"><div class="val">${k.val}</div><div class="lbl">${k.lbl}</div></div>
-`).join("");
+  return { name: raw.name, type: raw.contour, company: raw.company, status, amount: raw.amount, completion };
+}
 
-document.getElementById('clientsNote').textContent = `${totalParticipants} строк · выручка ${fmtMoney(totalRevenue)} ₽`;
-document.getElementById('commentsNote').textContent = `${survey.length} ответов из ${totalParticipants} участников`;
-
-/* ================= STAIRCASE ================= */
-const staircase = document.getElementById('staircase');
-const maxH = 170;
-staircase.innerHTML = modules.map(m=>{
-  const rows = survey.filter(s=>s.module===m);
-  const nps = calcNPS(rows.map(r=>r.q5));
-  const h = Math.max(24, ((nps+100)/200) * maxH);
-  return `<div class="step">
-    <div class="bar" style="height:${h}px"><div class="score">${nps.toFixed(0)}%</div></div>
-    <div class="name">${modShort[m]}</div>
-    <div class="n">n=${rows.length}</div>
-  </div>`;
-}).join("");
-
-/* ================= CLIENT TABLE + FILTERS ================= */
-let clientFilter = {manager:"all", status:"all"};
-const managers = ["all", ...new Set(clients.map(c=>c.manager))];
-
-function renderClientFilters(){
-  const statusLabels = {all:"Все статусы",paid:"Оплачено",issue:"Уточняется"};
-  const html = `
-    ${Object.keys(statusLabels).map(s=>`<button data-f="status" data-v="${s}" class="${clientFilter.status===s?'active':''}">${statusLabels[s]}</button>`).join("")}
-  `;
-  document.getElementById('clientFilters').innerHTML = html;
-  document.querySelectorAll('#clientFilters button').forEach(b=>{
-    b.onclick = ()=>{ clientFilter.status = b.dataset.v; renderClientFilters(); renderClientTable(); };
+function buildModuleMaps(survey){
+  const modules = [...new Set(survey.map(s=>s.module))];
+  const modShort = {};
+  modules.forEach(m=>{
+    const match = m.match(/МК\d+/);
+    modShort[m] = match ? match[0] : m.slice(0,6);
   });
+  return { modules, modShort };
 }
-function renderClientTable(){
-  const rows = clients.filter(c=> clientFilter.status==="all" || c.status===clientFilter.status);
-  const statusBadge = {paid:'<span class="badge paid">оплачено</span>',issue:'<span class="badge issue">уточняется</span>',internal:'<span class="badge internal">внутренний</span>'};
-  const compBadge = c => c.completion==="cert" ? '<span class="badge cert">сертификат</span>' : '<span class="badge none">не сдан проект</span>';
-  document.querySelector('#clientTable tbody').innerHTML = rows.map(c=>`
-    <tr>
-      <td>${c.name}</td>
-      <td>${c.company}</td>
-      <td>${c.amount? fmtMoney(c.amount)+" ₽" : "—"}</td>
-      <td>${statusBadge[c.status]}</td>
-      <td>${compBadge(c)}</td>
-    </tr>
-  `).join("");
-}
-renderClientFilters(); renderClientTable();
 
-/* ================= CHARTS ================= */
-Chart.defaults.color = "#9099c0";
-Chart.defaults.font.family = "Inter";
-Chart.defaults.borderColor = "#2a3363";
+/* ================= ЗАГРУЗКА ДАННЫХ ================= */
+async function loadData(){
+  const statusEl = document.getElementById('syncStatus');
+  try {
+    const [clientsRes, surveyRes] = await Promise.all([
+      fetch(CLIENTS_API).then(r=>r.json()),
+      fetch(SURVEY_API).then(r=>r.json())
+    ]);
 
-const statusCounts = {paid:paidCount, issue:issueCount};
-new Chart(document.getElementById('paymentStatus'), {
-  type:'doughnut',
-  data:{ labels:["Оплачено","Уточняется"], datasets:[{data:[statusCounts.paid,statusCounts.issue], backgroundColor:["#6fbf9e","#e2687a"], borderWidth:0}]},
-  options:{ plugins:{legend:{position:'bottom', labels:{boxWidth:10,padding:14,font:{size:11}}}}, responsive:true, maintainAspectRatio:false, cutout:"62%" }
-});
+    const clients = clientsRes.clients
+      .map(classifyClient)
+      .filter(c => c.type === 'Внешний' && c.status !== 'excluded');
 
-const critLabels = [
-  "Актуальность, структура, достаточность",
-  "Применимость на практике",
-  "Работа тренера",
-  "Польза участия"
-];
-const critKeys = ["q1","q2","q3","q4"];
-const critColors = ["#e8a33d","#6fbf9e","#7fa8e0","#c9a3e8"];
-new Chart(document.getElementById('moduleScores'), {
-  type:'line',
-  data:{
-    labels: modules.map(m=>modShort[m]),
-    datasets: critKeys.map((k,i)=>({
-      label: critLabels[i],
-      data: modules.map(m=> avg(survey.filter(s=>s.module===m).map(s=>s[k]))),
-      borderColor: critColors[i],
-      backgroundColor: critColors[i],
-      tension:0.35,
-      pointRadius:4,
-      borderWidth:2
-    }))
-  },
-  options:{ scales:{ y:{min:0,max:10,grid:{color:"#232a52"}}, x:{grid:{display:false}} }, plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:14,font:{size:11}}}}, responsive:true, maintainAspectRatio:false }
-});
+    const survey = surveyRes.survey.filter(s => s.module);
 
-new Chart(document.getElementById('npsChart'), {
-  type:'bar',
-  data:{
-    labels: modules.map(m=>modShort[m]),
-    datasets:[{
-      label:"NPS, %",
-      data: modules.map(m=> calcNPS(survey.filter(s=>s.module===m).map(s=>s.q5))),
-      backgroundColor: "#e8a33d",
-      borderRadius:6
-    }]
-  },
-  options:{
-    scales:{ y:{min:-100,max:100,grid:{color:"#232a52"},ticks:{callback:v=>v+"%"}}, x:{grid:{display:false}} },
-    plugins:{legend:{display:false}},
-    responsive:true, maintainAspectRatio:false
+    renderDashboard(clients, survey);
+
+    const updated = new Date(Math.max(new Date(clientsRes.updated), new Date(surveyRes.updated)));
+    statusEl.textContent = "Данные обновлены: " + updated.toLocaleString('ru-RU');
+    statusEl.classList.remove('error');
+  } catch (err) {
+    statusEl.textContent = "Не удалось загрузить свежие данные (" + err.message + "). Проверьте, что обе Google Apps Script ссылки развёрнуты с доступом «Все».";
+    statusEl.classList.add('error');
+    document.getElementById('loadingOverlay').textContent = "Не удалось загрузить данные — см. сообщение выше.";
   }
-});
+}
 
-/* ================= COMMENTS ================= */
-let commentFilter = {module:"all", lowOnly:false};
-function renderCommentFilters(){
-  let html = `<button data-m="all" class="${commentFilter.module==='all'?'active':''}">Все модули</button>`;
-  modules.forEach(m=> html += `<button data-m="${m}" class="${commentFilter.module===m?'active':''}">${modShort[m]}</button>`);
-  html += `<button id="lowToggle" class="${commentFilter.lowOnly?'active':''}">Только оценки ниже 7</button>`;
-  document.getElementById('commentFilters').innerHTML = html;
-  document.querySelectorAll('#commentFilters button[data-m]').forEach(b=>{
-    b.onclick = ()=>{ commentFilter.module = b.dataset.m; renderCommentFilters(); renderComments(); };
+/* ================= ОТРИСОВКА ДАШБОРДА ================= */
+function renderDashboard(clients, survey){
+  const { modules, modShort } = buildModuleMaps(survey);
+
+  /* --- KPI --- */
+  const totalRevenue = clients.reduce((s,c)=>s+c.amount,0);
+  const revenueNoVat = totalRevenue / 1.2;
+  const totalParticipants = clients.length;
+  const paidCount = clients.filter(c=>c.status==="paid").length;
+  const issueCount = clients.filter(c=>c.status==="issue").length;
+  const overallNPS = calcNPS(survey.map(s=>s.q5));
+
+  document.getElementById('heroRevenue').textContent = revenueNoVat.toLocaleString('ru-RU',{minimumFractionDigits:2, maximumFractionDigits:2});
+  document.getElementById('heroNPS').textContent = overallNPS.toFixed(0) + "%";
+  document.getElementById('heroParticipants').textContent = totalParticipants;
+
+  const kpis = [
+    {val:revenueNoVat.toLocaleString('ru-RU',{minimumFractionDigits:2, maximumFractionDigits:2})+" ₽", lbl:"Выручка без НДС (оценочно, ÷1.2)", cls:""},
+    {val:fmtMoney(totalRevenue)+" ₽", lbl:"Выручка с НДС (для справки)", cls:""},
+    {val:survey.length, lbl:"Ответов в опросе (из "+totalParticipants+" участников)", cls:""},
+  ];
+  document.getElementById('kpiRow').innerHTML = kpis.map(k=>`
+    <div class="kpi ${k.cls}"><div class="val">${k.val}</div><div class="lbl">${k.lbl}</div></div>
+  `).join("");
+
+  document.getElementById('clientsNote').textContent = `${totalParticipants} строк · выручка ${fmtMoney(totalRevenue)} ₽`;
+  document.getElementById('commentsNote').textContent = `${survey.length} ответов из ${totalParticipants} участников`;
+
+  /* --- STAIRCASE --- */
+  const staircase = document.getElementById('staircase');
+  const maxH = 170;
+  staircase.innerHTML = modules.map(m=>{
+    const rows = survey.filter(s=>s.module===m);
+    const nps = calcNPS(rows.map(r=>r.q5));
+    const h = Math.max(24, ((nps+100)/200) * maxH);
+    return `<div class="step">
+      <div class="bar" style="height:${h}px"><div class="score">${nps.toFixed(0)}%</div></div>
+      <div class="name">${modShort[m]}</div>
+      <div class="n">n=${rows.length}</div>
+    </div>`;
+  }).join("");
+
+  /* --- CLIENT TABLE + FILTERS --- */
+  let clientFilter = {status:"all"};
+  function renderClientFilters(){
+    const statusLabels = {all:"Все статусы",paid:"Оплачено",issue:"Уточняется"};
+    document.getElementById('clientFilters').innerHTML = Object.keys(statusLabels).map(s=>
+      `<button data-v="${s}" class="${clientFilter.status===s?'active':''}">${statusLabels[s]}</button>`
+    ).join("");
+    document.querySelectorAll('#clientFilters button').forEach(b=>{
+      b.onclick = ()=>{ clientFilter.status = b.dataset.v; renderClientFilters(); renderClientTable(); };
+    });
+  }
+  function renderClientTable(){
+    const rows = clients.filter(c=> clientFilter.status==="all" || c.status===clientFilter.status);
+    const statusBadge = {paid:'<span class="badge paid">оплачено</span>',issue:'<span class="badge issue">уточняется</span>',internal:'<span class="badge internal">внутренний</span>'};
+    const compBadge = c => c.completion==="cert" ? '<span class="badge cert">сертификат</span>' : '<span class="badge none">не сдан проект</span>';
+    document.querySelector('#clientTable tbody').innerHTML = rows.map(c=>`
+      <tr>
+        <td>${c.name}</td>
+        <td>${c.company}</td>
+        <td>${c.amount? fmtMoney(c.amount)+" ₽" : "—"}</td>
+        <td>${statusBadge[c.status]}</td>
+        <td>${compBadge(c)}</td>
+      </tr>
+    `).join("");
+  }
+  renderClientFilters(); renderClientTable();
+
+  /* --- CHARTS --- */
+  Chart.defaults.color = "#9099c0";
+  Chart.defaults.font.family = "Inter";
+  Chart.defaults.borderColor = "#2a3363";
+
+  new Chart(document.getElementById('paymentStatus'), {
+    type:'doughnut',
+    data:{ labels:["Оплачено","Уточняется"], datasets:[{data:[paidCount,issueCount], backgroundColor:["#6fbf9e","#e2687a"], borderWidth:0}]},
+    options:{ plugins:{legend:{position:'bottom', labels:{boxWidth:10,padding:14,font:{size:11}}}}, responsive:true, maintainAspectRatio:false, cutout:"62%" }
   });
-  document.getElementById('lowToggle').onclick = ()=>{ commentFilter.lowOnly = !commentFilter.lowOnly; renderCommentFilters(); renderComments(); };
-}
-function renderComments(){
-  let rows = survey.filter(s=> commentFilter.module==="all" || s.module===commentFilter.module);
-  if(commentFilter.lowOnly) rows = rows.filter(s=> s.q5!==null && s.q5<7);
-  document.getElementById('commentsList').innerHTML = rows.map(s=>`
-    <div class="comment">
-      <div class="meta">
-        <span>${modShort[s.module]}</span>
-        <span class="score ${s.q5!==null && s.q5<7 ? 'low':''}">NPS ${s.q5 ?? "—"}</span>
+
+  const critLabels = [
+    "Актуальность, структура, достаточность",
+    "Применимость на практике",
+    "Работа тренера",
+    "Польза участия"
+  ];
+  const critKeys = ["q1","q2","q3","q4"];
+  const critColors = ["#e8a33d","#6fbf9e","#7fa8e0","#c9a3e8"];
+  new Chart(document.getElementById('moduleScores'), {
+    type:'line',
+    data:{
+      labels: modules.map(m=>modShort[m]),
+      datasets: critKeys.map((k,i)=>({
+        label: critLabels[i],
+        data: modules.map(m=> avg(survey.filter(s=>s.module===m).map(s=>s[k]))),
+        borderColor: critColors[i],
+        backgroundColor: critColors[i],
+        tension:0.35,
+        pointRadius:4,
+        borderWidth:2
+      }))
+    },
+    options:{ scales:{ y:{min:0,max:10,grid:{color:"#232a52"}}, x:{grid:{display:false}} }, plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:14,font:{size:11}}}}, responsive:true, maintainAspectRatio:false }
+  });
+
+  new Chart(document.getElementById('npsChart'), {
+    type:'bar',
+    data:{
+      labels: modules.map(m=>modShort[m]),
+      datasets:[{
+        label:"NPS, %",
+        data: modules.map(m=> calcNPS(survey.filter(s=>s.module===m).map(s=>s.q5))),
+        backgroundColor: "#e8a33d",
+        borderRadius:6
+      }]
+    },
+    options:{
+      scales:{ y:{min:-100,max:100,grid:{color:"#232a52"},ticks:{callback:v=>v+"%"}}, x:{grid:{display:false}} },
+      plugins:{legend:{display:false}},
+      responsive:true, maintainAspectRatio:false
+    }
+  });
+
+  /* --- COMMENTS --- */
+  let commentFilter = {module:"all", lowOnly:false};
+  function renderCommentFilters(){
+    let html = `<button data-m="all" class="${commentFilter.module==='all'?'active':''}">Все модули</button>`;
+    modules.forEach(m=> html += `<button data-m="${m}" class="${commentFilter.module===m?'active':''}">${modShort[m]}</button>`);
+    html += `<button id="lowToggle" class="${commentFilter.lowOnly?'active':''}">Только оценки ниже 7</button>`;
+    document.getElementById('commentFilters').innerHTML = html;
+    document.querySelectorAll('#commentFilters button[data-m]').forEach(b=>{
+      b.onclick = ()=>{ commentFilter.module = b.dataset.m; renderCommentFilters(); renderComments(); };
+    });
+    document.getElementById('lowToggle').onclick = ()=>{ commentFilter.lowOnly = !commentFilter.lowOnly; renderCommentFilters(); renderComments(); };
+  }
+  function renderComments(){
+    let rows = survey.filter(s=> commentFilter.module==="all" || s.module===commentFilter.module);
+    if(commentFilter.lowOnly) rows = rows.filter(s=> s.q5!==null && s.q5<7);
+    document.getElementById('commentsList').innerHTML = rows.map(s=>`
+      <div class="comment">
+        <div class="meta">
+          <span>${modShort[s.module]}</span>
+          <span class="score ${s.q5!==null && s.q5<7 ? 'low':''}">NPS ${s.q5 ?? "—"}</span>
+        </div>
+        <p>${s.comment || "<i>без комментария</i>"}</p>
+        ${s.who ? `<div class="who">${s.who}</div>` : ""}
       </div>
-      <p>${s.comment || "<i>без комментария</i>"}</p>
-      ${s.who ? `<div class="who">${s.who}</div>` : ""}
-    </div>
-  `).join("") || "<p style='color:var(--muted)'>Нет комментариев по выбранным фильтрам.</p>";
+    `).join("") || "<p style='color:var(--muted)'>Нет комментариев по выбранным фильтрам.</p>";
+  }
+  renderCommentFilters(); renderComments();
+
+  document.getElementById('loadingOverlay').classList.add('hidden');
+  document.getElementById('dashboardBody').classList.remove('hidden');
 }
-renderCommentFilters(); renderComments();
+
+loadData();
 </script>
 </body>
 </html>
