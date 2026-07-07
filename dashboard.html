@@ -105,8 +105,12 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .chart-box{position:relative;height:260px;}
 
 .insights{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
-.insight{background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:22px 20px;position:relative;}
+.insight{background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:22px 20px;position:relative;border-top:3px solid var(--gold);}
+.insight.rose{border-top-color:var(--rose);}
+.insight.mint{border-top-color:var(--mint);}
 .insight-n{font-family:'Fraunces',serif;font-size:26px;color:var(--gold);opacity:.55;margin-bottom:10px;}
+.insight.rose .insight-n{color:var(--rose);}
+.insight.mint .insight-n{color:var(--mint);}
 .insight h4{font-family:'Fraunces',serif;font-size:16.5px;font-weight:600;margin:0 0 10px;line-height:1.3;color:var(--ink);}
 .insight p{font-size:13px;line-height:1.55;color:#c7cbe8;margin:0 0 14px;}
 .insight .tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.04em;color:var(--muted);border:1px solid var(--card-border);border-radius:20px;padding:4px 10px;}
@@ -187,39 +191,78 @@ footer{text-align:center;color:var(--muted-2);font-size:12px;margin-top:60px;}
 
   <section>
     <div class="section-head">
-      <h2>ТОП-5 выводов из обратной связи</h2>
+      <h2>ТОП-5: над чем поработать</h2>
       <div class="note">на основе 48 ответов и текстовых комментариев участников</div>
     </div>
     <div class="insights">
-      <div class="insight">
+      <div class="insight rose">
         <div class="insight-n">01</div>
         <h4>Не хватает практики — особенно в начале курса</h4>
         <p>На МК1 несколько участников прямо просят больше практических заданий и меньше теории: «больше практики и попроще», «важно больше примеров».</p>
         <div class="tag">МК1 Погружение в AI</div>
       </div>
-      <div class="insight">
+      <div class="insight rose">
         <div class="insight-n">02</div>
         <h4>МК2 «Cowork и AI-агенты» — самый слабый модуль</h4>
-        <p>Здесь минимальные оценки всего опроса (6–7 баллов): «было впечатление хаоса», «практика в процессе неудобна». У части участников не было доступа к платному Claude, что мешало практике вживую.</p>
+        <p>Здесь минимальные оценки всего опроса (6–7 баллов): «было впечатление хаоса», «практика в процессе неудобна».</p>
         <div class="tag">МК2 Cowork и AI-агенты</div>
       </div>
-      <div class="insight">
+      <div class="insight rose">
         <div class="insight-n">03</div>
+        <h4>Доступ к платному Claude — барьер для практики</h4>
+        <p>Часть участников не могла отрабатывать материал вживую: «Клауд не оплатила и в моменте не могла потыкать руками».</p>
+        <div class="tag">МК2 Cowork и AI-агенты</div>
+      </div>
+      <div class="insight rose">
+        <div class="insight-n">04</div>
         <h4>Темп и длительность МК1 утомляют новичков</h4>
         <p>Вводный модуль рассчитан на разный уровень подготовки: «галопом по европам, на скорости х4», «тяжеловато в плане 2,5 часов, под конец мозг закипает».</p>
         <div class="tag">МК1 Погружение в AI</div>
       </div>
-      <div class="insight">
-        <div class="insight-n">04</div>
+      <div class="insight rose">
+        <div class="insight-n">05</div>
+        <h4>Obsidian вызвал затруднения</h4>
+        <p>В отличие от соседних инструментов, этот не зашёл сразу: «Obsidian пока не очень поняла насколько полезно будет» — стоит отдельно разобрать его применение на практике.</p>
+        <div class="tag">МК4 Notion: база знаний</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>ТОП-5: что получилось супер</h2>
+      <div class="note">на основе 48 ответов и текстовых комментариев участников</div>
+    </div>
+    <div class="insights">
+      <div class="insight mint">
+        <div class="insight-n">01</div>
         <h4>К финалу курса — почти максимальная удовлетворённость</h4>
         <p>МК3–МК5 стабильно получают 9–10 баллов и NPS около 100%: «все отлично, было интересно посмотреть на кейсы участников», «заложенный фундамент, который можно перестраивать».</p>
         <div class="tag">МК3–МК5</div>
       </div>
-      <div class="insight">
-        <div class="insight-n">05</div>
-        <h4>Инструменты заходят по-разному: NotebookLM — восторг, Obsidian — непонятно</h4>
-        <p>В одном и том же отзыве по МК4: «NotebookLM прям открытие!» и тут же «Obsidian пока не очень поняла насколько полезно будет» — стоит отдельно разобрать применение Obsidian на практике.</p>
+      <div class="insight mint">
+        <div class="insight-n">02</div>
+        <h4>NotebookLM вызвал восторг</h4>
+        <p>Один из самых ярких откликов на конкретный инструмент за весь курс: «NotebookLM прям открытие!»</p>
         <div class="tag">МК4 Notion: база знаний</div>
+      </div>
+      <div class="insight mint">
+        <div class="insight-n">03</div>
+        <h4>Разбор кейсов участников высоко оценили</h4>
+        <p>Формат финального модуля с реальными кейсами зашёл особенно хорошо: «было интересно посмотреть на кейсы участников курса, зарядилась новыми идеями».</p>
+        <div class="tag">МК5 Защита</div>
+      </div>
+      <div class="insight mint">
+        <div class="insight-n">04</div>
+        <h4>Личный опыт тренера высоко ценят</h4>
+        <p>Участники отдельно отмечают именно практический опыт спикера, а не только теорию: «личный опыт Надежды очень ценен для меня».</p>
+        <div class="tag">МК5 Защита</div>
+      </div>
+      <div class="insight mint">
+        <div class="insight-n">05</div>
+        <h4>Внимание к разному уровню подготовки заметили и оценили</h4>
+        <p>Формат вводного модуля учли для новичков — и это отметили сами участники: «большое спасибо, что уделяете внимание и учитываете, что есть новички. Очень полезно и интересно».</p>
+        <div class="tag">МК1 Погружение в AI</div>
       </div>
     </div>
   </section>
