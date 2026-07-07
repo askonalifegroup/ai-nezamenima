@@ -329,7 +329,7 @@ function renderDashboard(clients, survey, internalCount){
 
   /* --- KPI --- */
   const totalRevenue = clients.reduce((s,c)=>s+c.amount,0);
-  const revenueNoVat = totalRevenue / 1.2;
+  const revenueNoVat = totalRevenue * 0.78; // НДС 22%: выручка минус 22%
   const totalParticipants = clients.length;
   const paidCount = clients.filter(c=>c.status==="paid").length;
   const issueCount = clients.filter(c=>c.status==="issue").length;
@@ -340,7 +340,7 @@ function renderDashboard(clients, survey, internalCount){
   document.getElementById('heroParticipants').textContent = totalParticipants;
 
   const kpis = [
-    {val:revenueNoVat.toLocaleString('ru-RU',{minimumFractionDigits:2, maximumFractionDigits:2})+" ₽", lbl:"Выручка без НДС (оценочно, ÷1.2)", cls:""},
+    {val:revenueNoVat.toLocaleString('ru-RU',{minimumFractionDigits:2, maximumFractionDigits:2})+" ₽", lbl:"Выручка без НДС (ставка 22%)", cls:""},
     {val:fmtMoney(totalRevenue)+" ₽", lbl:"Выручка с НДС (для справки)", cls:""},
     {val:survey.length, lbl:"Всего ответов в опросе", cls:""},
     {val:internalCount, lbl:"Внутренних студентов (сотрудники Askona)", cls:""},
