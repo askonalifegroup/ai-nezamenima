@@ -294,9 +294,11 @@ async function loadData(){
       .map(classifyClient)
       .filter(c => c.type === 'Внешний' && c.status !== 'excluded');
 
+    const internalCount = clientsRes.clients.filter(c => c.contour === 'Внутренний').length;
+
     const survey = surveyRes.survey.filter(s => s.module);
 
-    renderDashboard(clients, survey);
+    renderDashboard(clients, survey, internalCount);
 
     const updated = new Date(Math.max(new Date(clientsRes.updated), new Date(surveyRes.updated)));
     statusEl.textContent = "Данные обновлены: " + updated.toLocaleString('ru-RU');
@@ -309,7 +311,7 @@ async function loadData(){
 }
 
 /* ================= ОТРИСОВКА ДАШБОРДА ================= */
-function renderDashboard(clients, survey){
+function renderDashboard(clients, survey, internalCount){
   const { modules, modShort } = buildModuleMaps(survey);
 
   /* --- KPI --- */
@@ -327,7 +329,8 @@ function renderDashboard(clients, survey){
   const kpis = [
     {val:revenueNoVat.toLocaleString('ru-RU',{minimumFractionDigits:2, maximumFractionDigits:2})+" ₽", lbl:"Выручка без НДС (оценочно, ÷1.2)", cls:""},
     {val:fmtMoney(totalRevenue)+" ₽", lbl:"Выручка с НДС (для справки)", cls:""},
-    {val:survey.length, lbl:"Ответов в опросе (из "+totalParticipants+" участников)", cls:""},
+    {val:survey.length, lbl:"Всего ответов в опросе", cls:""},
+    {val:internalCount, lbl:"Внутренних студентов (сотрудники Askona)", cls:""},
   ];
   document.getElementById('kpiRow').innerHTML = kpis.map(k=>`
     <div class="kpi ${k.cls}"><div class="val">${k.val}</div><div class="lbl">${k.lbl}</div></div>
