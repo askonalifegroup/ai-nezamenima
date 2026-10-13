@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI-НЕЗАМЕНИМА — итоги курса</title>
+<title>AI-НЕЗАМЕНИМЫ — итоги курса</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -61,6 +61,7 @@ section{margin-bottom:56px;}
 .grid-2{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;}
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
 @media(max-width:860px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+.grid-2>*,.grid-3>*{min-width:0;}
 
 .card{background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:22px 22px;}
 .card h3{font-size:15px;font-family:'Inter',sans-serif;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:16px;}
@@ -86,7 +87,7 @@ table{width:100%;border-collapse:collapse;font-size:13.5px;}
 th{text-align:left;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--line);}
 td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.04);}
 tr:hover td{background:rgba(255,255,255,0.02);}
-.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
 .badge.paid{background:rgba(111,191,158,0.15);color:var(--mint);}
 .badge.issue{background:rgba(226,104,122,0.15);color:var(--rose);}
 .badge.internal{background:rgba(144,153,192,0.15);color:var(--muted);}
@@ -121,6 +122,20 @@ footer{text-align:center;color:var(--muted-2);font-size:12px;margin-top:60px;}
 #syncStatus.error{color:var(--rose);}
 #loadingOverlay{display:flex;align-items:center;justify-content:center;min-height:300px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:14px;}
 .hidden{display:none !important;}
+
+/* COHORT TABS */
+.tabs{display:inline-flex;gap:4px;background:var(--bg-soft);border:1px solid var(--card-border);border-radius:12px;padding:4px;margin-bottom:28px;flex-wrap:wrap;}
+.tabs button{background:transparent;border:0;color:var(--muted);font-family:'Inter',sans-serif;font-size:14px;font-weight:600;padding:9px 18px;border-radius:9px;cursor:pointer;}
+.tabs button.active{background:var(--gold);color:#1b1300;}
+.badge.check{background:rgba(232,163,61,0.15);color:var(--gold-soft);}
+.badge.unpaid{background:rgba(226,104,122,0.15);color:var(--rose);}
+.badge.defended{background:rgba(111,191,158,0.15);color:var(--mint);}
+.pending{border:1px dashed var(--card-border);border-radius:16px;padding:28px;color:var(--muted);font-size:14px;line-height:1.6;}
+.pending b{color:var(--ink);}
+.cmp td.num{font-family:'JetBrains Mono',monospace;text-align:right;}
+.cmp th.num{text-align:right;}
+.cmp td:first-child{color:#c7cbe8;}
+@media(max-width:600px){.hero h1{font-size:32px;}.wrap{padding:32px 16px 70px;}.hero-stat{text-align:left;}}
 </style>
 </head>
 <body>
@@ -129,17 +144,157 @@ footer{text-align:center;color:var(--muted-2);font-size:12px;margin-top:60px;}
   <div class="hero">
     <div>
       <div class="eyebrow">Корпоративный университет · ALG</div>
-      <h1>AI-НЕЗАМЕНИМА<br>итоги курса для ассистентов</h1>
-      <p class="sub">5 модулей, 48 ответов обратной связи и <span id="participantsSummary">39 внешних участников</span> — от первого погружения в AI до защиты собственного AI-рабочего дня.</p>
-      <div id="syncStatus">Загружаю актуальные данные из Google Таблиц…</div>
+      <h1 id="heroTitle">AI-НЕЗАМЕНИМЫ<br>итоги курса</h1>
+      <p class="sub" id="heroSub">5 модулей, 48 ответов обратной связи и <span id="participantsSummary">39 внешних участников</span> — от первого погружения в AI до защиты собственного AI-рабочего дня.</p>
+      <div id="syncStatus"></div>
     </div>
     <div class="hero-stats">
       <div class="hero-stat"><div class="num" id="heroRevenue">—</div><div class="lbl">выручка без НДС, ₽</div></div>
-      <div class="hero-stat"><div class="num" id="heroNPS">—</div><div class="lbl">средний NPS</div></div>
+      <div class="hero-stat"><div class="num" id="heroNPS">—</div><div class="lbl" id="heroMidLbl">средний NPS</div></div>
       <div class="hero-stat"><div class="num" id="heroParticipants">—</div><div class="lbl">участников всего</div></div>
     </div>
   </div>
 
+  <div class="tabs" id="cohortTabs">
+    <button data-v="1">1 поток</button>
+    <button data-v="2" class="active">2 поток</button>
+    <button data-v="cmp">Сравнение</button>
+  </div>
+
+  <!-- ================= 2 ПОТОК ================= -->
+  <div id="view2">
+    <div class="kpis" id="kpiRow2"></div>
+
+    <section>
+      <div class="section-head"><h2>Участники и выручка</h2><div class="note" id="clientsNote2"></div></div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Список участников</h3>
+          <div class="filters" id="clientFilters2"></div>
+          <div style="max-height:420px;overflow:auto;">
+            <table id="clientTable2">
+              <thead><tr><th>ФИО</th><th>Компания</th><th>Сумма</th><th>Итог курса</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Выручка по компаниям, ₽ с НДС</h3>
+          <div class="chart-box"><canvas id="revenue2"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>Компании: участники и защиты</h2><div class="note">сколько человек прислала компания и сколько из них защитили проект</div></div>
+      <div class="card">
+        <div class="chart-box" style="height:320px;"><canvas id="companies2"></canvas></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>Путь курса: динамика оценок по модулям</h2>
+        <div class="note">высота ступени = NPS модуля, % · n = число ответивших</div>
+      </div>
+      <div class="card">
+        <div class="staircase" id="staircase2"></div>
+        <p style="color:var(--muted-2);font-size:12px;margin:14px 0 0;">В форме не было отдельного пункта для защиты проектов: отзывы после защиты (6–11 октября) участники отметили как МК4.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>Динамика оценок по критериям</h2><div class="note">средний балл по шкале 1–10, по каждому вопросу опроса</div></div>
+      <div class="card"><div class="chart-box" style="height:320px;"><canvas id="moduleScores2"></canvas></div></div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>Готовность рекомендовать курс (NPS)</h2><div class="note">% промоутеров (9–10) минус % критиков (0–6), стандартная формула NPS</div></div>
+      <div class="card"><div class="chart-box" style="height:260px;"><canvas id="npsChart2"></canvas></div></div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>ТОП-5: над чем поработать</h2><div class="note">на основе 31 ответа и комментариев участников</div></div>
+      <div class="insights">
+        <div class="insight rose"><div class="insight-n">01</div>
+          <h4>Публичная защита как условие сертификата</h4>
+          <p>Единственная низкая оценка рекомендации после защиты (5 из 10): рабочие задачи бывают под NDA, а показывать личное при коллегах и руководителях готовы не все. Стоит дать альтернативу — закрытую защиту или обезличенный кейс.</p>
+          <div class="tag">Защита проектов</div></div>
+        <div class="insight rose"><div class="insight-n">02</div>
+          <h4>МК3 «Презентации и данные» — самый слабый модуль</h4>
+          <p>NPS 50%, здесь единственный провал опроса (4 из 10): постоянные переключения между приложениями, «не хватило структурности». Модулю нужен понятный сквозной сценарий.</p>
+          <div class="tag">МК3 Презентации и данные</div></div>
+        <div class="insight rose"><div class="insight-n">03</div>
+          <h4>Три часа вечером — тяжело для новой темы</h4>
+          <p>Несколько человек независимо просят занятия короче, но чаще: сложно держать концентрацию все 3 часа, «достаточно поздно заканчиваем».</p>
+          <div class="tag">МК1–МК3</div></div>
+        <div class="insight rose"><div class="insight-n">04</div>
+          <h4>Разный уровень в одной группе</h4>
+          <p>Предлагают разделить поток на новичков и продвинутых; часть участников честно пишет, что применять Claude пока сложно.</p>
+          <div class="tag">МК2 Claude</div></div>
+        <div class="insight rose"><div class="insight-n">05</div>
+          <h4>Практика отстаёт от темпа показа</h4>
+          <p>Не успевают повторять за тренером и проходят заново; просят пошагово разобрать методологию промта и заранее установить нужные скиллы. Плюс связь в Zoom периодически пропадает.</p>
+          <div class="tag">МК2–МК3</div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>ТОП-5: что получилось супер</h2><div class="note">на основе 31 ответа и комментариев участников</div></div>
+      <div class="insights">
+        <div class="insight mint"><div class="insight-n">01</div>
+          <h4>24 из 31 оценки «рекомендую» — десятки</h4>
+          <p>Общий NPS второго потока 81%. МК1 и МК2 — почти сплошь 9–10, а МК4 получил 10 по всем четырём критериям у каждого ответившего.</p>
+          <div class="tag">Весь курс</div></div>
+        <div class="insight mint"><div class="insight-n">02</div>
+          <h4>Применяют сразу, в рабочих задачах</h4>
+          <p>Уже после первых модулей: «сразу применила в фиксации сроков по итогам совещаний», «уже применил на практике, сэкономил много времени».</p>
+          <div class="tag">МК1–МК2</div></div>
+        <div class="insight mint"><div class="insight-n">03</div>
+          <h4>Notion и NotebookLM снова в хитах</h4>
+          <p>Как и в первом потоке, NotebookLM — открытие модуля: «наконец-то я поняла, как жить с этим ноушн легко».</p>
+          <div class="tag">МК4 База знаний</div></div>
+        <div class="insight mint"><div class="insight-n">04</div>
+          <h4>Сложное — простым языком</h4>
+          <p>Работу тренера оценили в среднем на 9,7 из 10: «сложное объяснили просто», «очень подробно и доходчиво». Отдельно отметили создание скиллов в Claude.</p>
+          <div class="tag">МК1–МК2</div></div>
+        <div class="insight mint"><div class="insight-n">05</div>
+          <h4>Кейсы одногруппников вдохновляют</h4>
+          <p>Защита проектов зарядила участников: «восхитительные проекты коллег», «вдохновляет особенно кейсы одногруппников». Есть запрос на следующие курсы.</p>
+          <div class="tag">Защита проектов</div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>Все комментарии</h2><div class="note" id="commentsNote2"></div></div>
+      <div class="card">
+        <div class="filters" id="commentFilters2"></div>
+        <div id="commentsList2" style="max-height:520px;overflow:auto;"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ================= СРАВНЕНИЕ ================= -->
+  <div id="viewCmp" class="hidden">
+    <section>
+      <div class="section-head"><h2>1 поток и 2 поток рядом</h2><div class="note">выручка без НДС посчитана одинаково для обоих потоков</div></div>
+      <div class="card">
+        <table class="cmp" id="cmpTable">
+          <thead><tr><th>Показатель</th><th class="num">1 поток</th><th class="num">2 поток</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+    <section>
+      <div class="grid-2">
+        <div class="card"><h3>Выручка без НДС, ₽</h3><div class="chart-box"><canvas id="cmpRevenue"></canvas></div></div>
+        <div class="card"><h3>Участники и ответы в опросе</h3><div class="chart-box"><canvas id="cmpPeople"></canvas></div></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ================= 1 ПОТОК ================= -->
+  <div id="view1" class="hidden">
   <div id="loadingOverlay">Загружаю данные…</div>
   <div id="dashboardBody" class="hidden">
 
@@ -156,21 +311,20 @@ footer{text-align:center;color:var(--muted-2);font-size:12px;margin-top:60px;}
   </section>
 
   <section>
-    <div class="section-head"><h2>Клиенты и оплаты</h2><div class="note" id="clientsNote"></div></div>
+    <div class="section-head"><h2>Участники и выручка</h2><div class="note" id="clientsNote"></div></div>
     <div class="grid-2">
       <div class="card">
         <h3>Список участников</h3>
-        <div class="filters" id="clientFilters"></div>
-        <div style="max-height:420px;overflow:auto;">
+                <div style="max-height:420px;overflow:auto;">
           <table id="clientTable">
-            <thead><tr><th>ФИО</th><th>Компания</th><th>Сумма</th><th>Оплата</th><th>Итог курса</th></tr></thead>
+            <thead><tr><th>ФИО</th><th>Компания</th><th>Сумма</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
       </div>
       <div class="card">
-        <h3>Статус оплат</h3>
-        <div class="chart-box" style="height:420px;"><canvas id="paymentStatus"></canvas></div>
+        <h3>Выручка по компаниям, ₽ с НДС</h3>
+        <div class="chart-box"><canvas id="revenue1"></canvas></div>
       </div>
     </div>
   </section>
@@ -203,8 +357,8 @@ footer{text-align:center;color:var(--muted-2);font-size:12px;margin-top:60px;}
       </div>
       <div class="insight rose">
         <div class="insight-n">02</div>
-        <h4>МК2 «Cowork и AI-агенты» — самый слабый модуль</h4>
-        <p>Здесь минимальные оценки всего опроса (6–7 баллов): «было впечатление хаоса», «практика в процессе неудобна».</p>
+        <h4>Практика с Cowork на МК2 показалась хаотичной</h4>
+        <p>При NPS модуля 91% есть оценки 6–7 именно за практическую часть: «было впечатление хаоса», «практика в процессе неудобна».</p>
         <div class="tag">МК2 Cowork и AI-агенты</div>
       </div>
       <div class="insight rose">
@@ -215,8 +369,8 @@ footer{text-align:center;color:var(--muted-2);font-size:12px;margin-top:60px;}
       </div>
       <div class="insight rose">
         <div class="insight-n">04</div>
-        <h4>Темп и длительность МК1 утомляют новичков</h4>
-        <p>Вводный модуль рассчитан на разный уровень подготовки: «галопом по европам, на скорости х4», «тяжеловато в плане 2,5 часов, под конец мозг закипает».</p>
+        <h4>МК1 — самый слабый модуль: темп и длительность</h4>
+        <p>У вводного модуля самый низкий NPS курса — 70%, здесь же единственные оценки 3–4: «галопом по европам, на скорости х4», «тяжеловато в плане 2,5 часов, под конец мозг закипает».</p>
         <div class="tag">МК1 Погружение в AI</div>
       </div>
       <div class="insight rose">
@@ -279,14 +433,17 @@ footer{text-align:center;color:var(--muted-2);font-size:12px;margin-top:60px;}
   </section>
 
   </div>
+  </div><!-- /view1 -->
 
-  <footer>Дашборд собран автоматически из данных Google Таблиц · курс «AI-НЕЗАМЕНИМА»</footer>
+  <footer>Данные обоих потоков — таблицы продаж и опросов обратной связи, выгрузка 13.10.2026 · курс «AI-НЕЗАМЕНИМЫ»</footer>
 </div>
 
 <script>
-/* ================= ИСТОЧНИКИ ДАННЫХ ================= */
-const CLIENTS_API = "https://script.google.com/macros/s/AKfycbxZVICbaAVW2llSaQe1gQCJOjszix5HCXSnNYXinOCr72RoGHEaqTQWz8Zetje2SGYJ1w/exec";
-const SURVEY_API = "https://script.google.com/macros/s/AKfycbxZTUbIMTNTZMbXnLyesfZTSr0p4ku9f4wJIDqAZrExdFcvREk7sHlfDD4D2UUU-qY1/exec";
+/* ================= 1 ПОТОК: ДАННЫЕ ================= */
+/* Участники и оплаты — таблица продаж (суммы с НДС), присланная 13.10.2026.
+   Опрос — «ОС по итогам курса "AI-незаменим(а)" (Ответы)», Google Таблица, 48 ответов. */
+const C1_CLIENTS = [{"name": "Горохов Владимир Вячеславович", "company": "ИП Горохов Владимир Вячеславович", "amount": 32300}, {"name": "Сергиенко Андрей Владиславович", "company": "ООО Барс Консалт", "amount": 32300}, {"name": "Китюха Алена Сергеевна", "company": "ООО «ДРУГИЕ МИРЫ»", "amount": 32300}, {"name": "Специан Назар", "company": "АНО ДПО «Академия ТОП»", "amount": 109820}, {"name": "Новоселова Оксана", "company": "АНО ДПО «Академия ТОП»", "amount": 0}, {"name": "Сергеева Алина", "company": "АНО ДПО «Академия ТОП»", "amount": 0}, {"name": "Бабурян Раиса", "company": "АНО ДПО «Академия ТОП»", "amount": 0}, {"name": "Андрей Шеин", "company": "ООО «Мониторинг-Сервис»", "amount": 32300}, {"name": "Камалова Ксения Родионовна", "company": "Телемтика-сервис ГК «ЮМС»", "amount": 32300}, {"name": "Дарья Фикс", "company": "ИП Романов РР", "amount": 32300}, {"name": "Бычина Кристина Владимировна", "company": "ИП Унжакова Вероника Сергеевна", "amount": 32300}, {"name": "Каплан Екатерина Романовна", "company": "Амбитика Медиа Плюс", "amount": 27455}, {"name": "Азаренков Кирилл Андреевич", "company": "Амбитика Медиа Плюс", "amount": 27455}, {"name": "Элькина Полина Михайловна", "company": "Амбитика Медиа Плюс", "amount": 27455}, {"name": "Комина Екатерина Максимовна", "company": "Амбитика Медиа Плюс", "amount": 27455}, {"name": "Ижболдина Полина Григорьевна", "company": "Амбитика Медиа Плюс", "amount": 27455}, {"name": "Веселова Юлия Васильевна", "company": "ООО Кант", "amount": 32300}, {"name": "Елисеева Екатерина Сергеевна", "company": "ООО «Первая Розничная компания»", "amount": 32300}, {"name": "Пинчина Алина Дмитриевна", "company": "ООО «Первая Розничная компания»", "amount": 32300}, {"name": "Кременец Елена Александровна", "company": "КВ системы", "amount": 32300}, {"name": "Долинина Ольга", "company": "ООО Крем-шоп", "amount": 25840}, {"name": "Керчелаева Алана", "company": "ООО Крем-шоп", "amount": 25840}, {"name": "Голикова Александра Игоревна", "company": "ООО Цимус", "amount": 32300}, {"name": "Ширингина Юлия Олеговна", "company": "ООО Невидимые решетки", "amount": 25194}, {"name": "Борисочкина Кристина Викторовна", "company": "ООО Невидимые решетки", "amount": 25194}, {"name": "Исакова Ольга Евгеньевна", "company": "Физлицо", "amount": 32300}, {"name": "Лабзина Оксана Аркадьевна", "company": "ООО Сокол-Т", "amount": 32300}, {"name": "Емельянова Наталья Анатольевна", "company": "ООО Би смарт", "amount": 32300}, {"name": "Юлия Лукина", "company": "ООО Премьера", "amount": 32300}, {"name": "Касьянова Анна", "company": "Физлицо", "amount": 29000}, {"name": "Дмитрий Русских", "company": "ИП Русских Анна Николаевна", "amount": 32300}, {"name": "Рудяков Глеб", "company": "ООО «Алькор и Ко» (Летуаль)", "amount": 29000}, {"name": "Ольга Филиченко", "company": "ООО «Алькор и Ко» (Летуаль)", "amount": 29000}, {"name": "Комосов Дмитрий Юрьевич", "company": "Физлицо", "amount": 29000}, {"name": "Виктор Щапкин", "company": "ООО «Алькор и Ко» (Летуаль)", "amount": 20000}, {"name": "Годунов Денис", "company": "ИП Годунов", "amount": 47840}, {"name": "Маренич Ирина Викторовна", "company": "Физлицо", "amount": 25000}];
+const C1_SURVEY = [{"ts": "23.05.2026 12:26:41", "module": "МК1 Погружение в AI", "q1": 3, "q2": 3, "q3": 10, "q4": 5, "q5": 3, "comment": "Не рассказывать а показывать на примерах", "who": ""}, {"ts": "23.05.2026 12:32:52", "module": "МК1 Погружение в AI", "q1": 8, "q2": 8, "q3": 9, "q4": 10, "q5": 10, "comment": "Все отлично!", "who": ""}, {"ts": "23.05.2026 12:33:00", "module": "МК1 Погружение в AI", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Надежда, огромное спасибо!", "who": "Оксана Паинцева"}, {"ts": "23.05.2026 12:33:41", "module": "МК1 Погружение в AI", "q1": 10, "q2": 10, "q3": 10, "q4": 6, "q5": 10, "comment": "Пожеланий нет. Первый урок вводный, думаю следующие знания будут более полезными для меня.", "who": ""}, {"ts": "23.05.2026 12:34:06", "module": "МК1 Погружение в AI", "q1": 10, "q2": 10, "q3": 10, "q4": 8, "q5": 10, "comment": "Так как встреча вводная и рассчитана на пользователей с разными исходными знаниями, большая часть инфо мне была знакома, но взяла на заметку некоторые фишечки, о которых не знала", "who": ""}, {"ts": "23.05.2026 12:34:08", "module": "МК1 Погружение в AI", "q1": 9, "q2": 9, "q3": 10, "q4": 10, "q5": 10, "comment": "Пожелание одно - больше практики. Теория это хорошо, но на практике все запоминается гораздо лучше.", "who": ""}, {"ts": "23.05.2026 12:34:31", "module": "МК1 Погружение в AI", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Продолжайте в том же духе", "who": "Дмитрий Комосов"}, {"ts": "23.05.2026 12:34:39", "module": "МК1 Погружение в AI", "q1": 9, "q2": 10, "q3": 9, "q4": 10, "q5": 10, "comment": "Очень много информации, огромное желание разобраться до молекул", "who": "Alina Pinchina"}, {"ts": "23.05.2026 12:34:40", "module": "МК1 Погружение в AI", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Пока сложно сформировать.", "who": "Шеина Андрей Владимирович"}, {"ts": "23.05.2026 12:34:46", "module": "МК1 Погружение в AI", "q1": 9, "q2": 10, "q3": 9, "q4": 9, "q5": 10, "comment": "Все нормально, нужно использовать и практиковаться", "who": "Годунов Дмитрий"}, {"ts": "23.05.2026 12:35:10", "module": "МК1 Погружение в AI", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Надежда, большое спасибо Вам! Всë понятно, иду подключать платные подписки)", "who": "Новоселова Оксана, Академия ТОП"}, {"ts": "23.05.2026 12:35:30", "module": "МК1 Погружение в AI", "q1": 5, "q2": 8, "q3": 9, "q4": 8, "q5": 7, "comment": "Больше практики и попроще)", "who": ""}, {"ts": "23.05.2026 12:35:39", "module": "МК1 Погружение в AI", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Надя, ты супер! Очень интересно. Знаю твой стиль преподавания с курса PA, поэтому шла на это обучение с уверенностью, что будет интересно и полезно. Тяжеловато в плане 2,5 часов, под конец мозг закипает и пытается отключиться, возможно это только у меня так. Конец встречи пересмотрю в записи через пару дней или когда буду делать дз. Надеюсь все твои знания впитать как губка! Внедрить себе, облегчить жизнь и работу себе и своему боссу. Спасибо!", "who": "Китюха Алена Сергеевна"}, {"ts": "23.05.2026 12:36:25", "module": "МК1 Погружение в AI", "q1": 10, "q2": 8, "q3": 10, "q4": 9, "q5": 10, "comment": "Все понравилось)", "who": ""}, {"ts": "23.05.2026 12:37:10", "module": "МК1 Погружение в AI", "q1": 8, "q2": 8, "q3": 9, "q4": 9, "q5": 8, "comment": "важно больше примеров, важна навигация , чтоб после урока легче было перейти к применению", "who": "Денис Годунов"}, {"ts": "23.05.2026 12:37:58", "module": "МК1 Погружение в AI", "q1": 7, "q2": 4, "q3": 5, "q4": 5, "q5": 4, "comment": "галоппом по европам, на скорости х4 вот это, это, это и это. Без понимания как аудитория поняла и приняла эту информацию.", "who": ""}, {"ts": "23.05.2026 12:41:55", "module": "МК1 Погружение в AI", "q1": 10, "q2": 9, "q3": 10, "q4": 10, "q5": 10, "comment": "Большое спасибо, что уделяете внимание и учитываете, что есть новички. Это очень важно. Было очень полезно и интересно. Много новой информации. С ожиданием жду следующих встреч", "who": ""}, {"ts": "23.05.2026 13:01:00", "module": "МК1 Погружение в AI", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Скорее не по этой теме тренинга. Я только вхожу в профессию Бизнес-ассистента/Персонального ассистента. Тот случай, когда работодатель предложил переквалифицироваться. Базово я более 8 лет организатор онлайн-обучения. Возможно ли получить информацию об азах профессиии. У вас была когда-то такая программа.", "who": "Анна Касьянова"}, {"ts": "24.05.2026 18:39:36", "module": "МК1 Погружение в AI", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Больше внимания к использованию на МП", "who": "Русских Дмитрий"}, {"ts": "29.05.2026 17:29:26", "module": "МК1 Погружение в AI", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Полезная информация на все 100%", "who": "Пронина Олеся Мансуровна"}, {"ts": "30.05.2026 13:14:42", "module": "МК2 Cowork и AI-агенты", "q1": 10, "q2": 10, "q3": 9, "q4": 9, "q5": 9, "comment": "на этот раз было много полезного и применимого на практике, но не весь учебный материал удалось продемонстрировать лектору", "who": ""}, {"ts": "30.05.2026 13:15:59", "module": "МК2 Cowork и AI-агенты", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Было очень здорово открыть для себя коворк", "who": ""}, {"ts": "30.05.2026 13:17:00", "module": "МК2 Cowork и AI-агенты", "q1": 10, "q2": 10, "q3": 10, "q4": null, "q5": 10, "comment": "Важно на практике показать, как работать с протоколами, и как создать код для работы с папками и сайтами в единой папке в ТГ.", "who": ""}, {"ts": "30.05.2026 13:17:17", "module": "МК2 Cowork и AI-агенты", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Все понравилось", "who": "Амплеева Алена Александровна"}, {"ts": "30.05.2026 13:18:17", "module": "МК2 Cowork и AI-агенты", "q1": 10, "q2": 10, "q3": 10, "q4": 8, "q5": 10, "comment": "Для меня сложновато прям. Возможно потому что Клауд не оплатила и в моменте не могла потыкать руками. Свой джипитис создать смогла. Есть ощущение что мой джипити отупел после введения инфы после персонализации…. Может быть такое? Вроде пишу прям подробный промпт или из, но он выдает такую дичь, аж вывел меня из себя сегодня.", "who": "Китюха Алена Сергеевна"}, {"ts": "30.05.2026 13:18:40", "module": "МК2 Cowork и AI-агенты", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Спасибо, всë подробно. Буду еще пересматривать)", "who": "Новоселова Оксана"}, {"ts": "30.05.2026 13:24:02", "module": "МК2 Cowork и AI-агенты", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Пока комментариев нет. Вникаю :)", "who": "Анна Касьянова"}, {"ts": "30.05.2026 13:25:03", "module": "МК2 Cowork и AI-агенты", "q1": 6, "q2": 7, "q3": 7, "q4": 7, "q5": 7, "comment": "На моменте когда начали работать с коворком, было впечатление хаоса, буду пересматривать. Для меня практика в процессе - очень неудобна, удобнее нажимать на паузу и делать самой. Про дашборд) то что показали красивую картинку -здорово, было бы круто скилом поделиться) Ноушеном лично мне не удобно пользоваться(", "who": ""}, {"ts": "30.05.2026 13:34:34", "module": "МК2 Cowork и AI-агенты", "q1": 9, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Ценная, полезная, применимая практика. Надежда, спасибо большое.) Просьба подготовку к занятию пораньше( за дня три) присылать , чтоб успеть качественно подготовиться.", "who": "Денис Годунов"}, {"ts": "30.05.2026 13:50:56", "module": "МК2 Cowork и AI-агенты", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Все отлично! Очень системно", "who": "Голикова Александра Игоревна"}, {"ts": "01.06.2026 21:42:35", "module": "МК2 Cowork и AI-агенты", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Есть над чем подумать опытным юзерам", "who": ""}, {"ts": "13.06.2026 12:39:58", "module": "МК3 Презентации, чек-листы, дашборды", "q1": 10, "q2": 10, "q3": 10, "q4": 8, "q5": 10, "comment": "Все понравилось, модуль был содержательным и полезным", "who": ""}, {"ts": "13.06.2026 12:43:07", "module": "МК3 Презентации, чек-листы, дашборды", "q1": 10, "q2": 10, "q3": 10, "q4": 8, "q5": 10, "comment": "Пока нет.", "who": "Шеина АВ"}, {"ts": "13.06.2026 12:43:25", "module": "МК3 Презентации, чек-листы, дашборды", "q1": 9, "q2": 9, "q3": 9, "q4": 9, "q5": 9, "comment": "все актуально", "who": "Годунов Денис Борисович"}, {"ts": "13.06.2026 12:46:18", "module": "МК3 Презентации, чек-листы, дашборды", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Все отлично! Спасибо!", "who": "Голикова Александра Игоревна"}, {"ts": "20.06.2026 12:50:15", "module": "МК4 Notion: база знаний компании", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Супер , много нового )", "who": ""}, {"ts": "20.06.2026 12:50:41", "module": "МК4 Notion: база знаний компании", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Все бесконечно нравится!", "who": "Амплеева Алена"}, {"ts": "20.06.2026 12:52:32", "module": "МК4 Notion: база знаний компании", "q1": 10, "q2": 9, "q3": 10, "q4": 10, "q5": 10, "comment": "NotebookLM прям открытие! Спасибо) обсидианом пока не очень поняла насколько мне полезно пользоваться будет. Но буду иметь в виду)", "who": "Фикс Дарья"}, {"ts": "20.06.2026 12:52:56", "module": "МК4 Notion: база знаний компании", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Спасибо, Надежда! Мне всë понятно. Много новых полезных инструментов", "who": "Новоселова Оксана"}, {"ts": "20.06.2026 12:53:29", "module": "МК4 Notion: база знаний компании", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 9, "comment": "Кусочно вникаю, но всё доступно по подаче", "who": "Анна Касьянова"}, {"ts": "20.06.2026 12:57:17", "module": "МК4 Notion: база знаний компании", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Все отлично, информативно!", "who": "Голикова Александра Игоревна"}, {"ts": "27.06.2026 10:22:48", "module": "МК5 Защита: AI-рабочий день ассистента", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Невероятно полезный опыт, который делает работу намного быстрее и легче. И хотелось бы и дальше развиваться и делиться опытом", "who": "Амплеева Алена"}, {"ts": "27.06.2026 10:25:36", "module": "МК5 Защита: AI-рабочий день ассистента", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Для меня этот курс как заложенный фундамент, построенное здание с возможностью перестраивать, остаётся только выполнить качественную отделку.", "who": "Шеин Андрей Владимирович"}, {"ts": "27.06.2026 12:55:05", "module": "МК5 Защита: AI-рабочий день ассистента", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Все отлично! Было интересно посмотреть на кейсы участников курса, зарядилась новыми идеями.", "who": ""}, {"ts": "27.06.2026 12:58:22", "module": "МК5 Защита: AI-рабочий день ассистента", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Очень классно! Все легко и понятно! Для новичков вообще кладезь информации🩶", "who": "Исакова Ольга"}, {"ts": "27.06.2026 13:01:42", "module": "МК5 Защита: AI-рабочий день ассистента", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Все отлично!", "who": "Голикова Александра Игоревна"}, {"ts": "27.06.2026 13:07:09", "module": "МК5 Защита: AI-рабочий день ассистента", "q1": 9, "q2": 9, "q3": 10, "q4": 9, "q5": 9, "comment": "все прошло хорошо, личный опыт Надежды очень ценен для меня.Спасибо", "who": "Годунов Денис"}, {"ts": "28.06.2026 18:06:00", "module": "МК5 Защита: AI-рабочий день ассистента", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Все отлично! Было интересно посмотреть на кейсы участников курса, зарядилась новыми идеями.", "who": ""}];
 
 /* ================= ХЕЛПЕРЫ ================= */
 const avg = arr => { const v = arr.filter(x=>x!==null && x!==undefined); return v.length? v.reduce((a,b)=>a+b,0)/v.length : 0; };
@@ -298,20 +455,20 @@ const calcNPS = arr => {
   return ((promoters - detractors) / v.length) * 100;
 };
 const fmtMoney = n => n.toLocaleString('ru-RU');
-
-/* ================= НОРМАЛИЗАЦИЯ ДАННЫХ ИЗ ТАБЛИЦ ================= */
-function classifyClient(raw){
-  const statusRaw = (raw.status_raw || '').toLowerCase();
-  let status;
-  if (raw.contour === 'Внутренний') status = 'internal';
-  else if (statusRaw.indexOf('направил') !== -1) status = 'excluded'; // отдельная сделка, не участник курса
-  else if (statusRaw.indexOf('оплач') !== -1) status = 'paid';
-  else if (statusRaw.indexOf('уточн') !== -1 || statusRaw.indexOf('нет информ') !== -1 || statusRaw.indexOf('нет в эдо') !== -1) status = 'issue';
-  else status = raw.amount > 0 ? 'paid' : 'issue';
-
-  const completion = (raw.completion_raw || '').toLowerCase().indexOf('сертификат') !== -1 ? 'cert' : 'none';
-
-  return { name: raw.name, type: raw.contour, company: raw.company, status, amount: raw.amount, completion };
+function revenueByCompany(canvasId, clients){
+  const map = {};
+  clients.forEach(c=>{ map[c.company] = (map[c.company]||0) + c.amount; });
+  const rows = Object.entries(map).filter(r=>r[1]>0).sort((a,b)=>b[1]-a[1]);
+  const box = document.getElementById(canvasId).parentElement;
+  box.style.height = Math.max(260, rows.length*26 + 40) + "px";
+  new Chart(document.getElementById(canvasId), {
+    type:'bar',
+    data:{ labels: rows.map(r=>r[0].replace(/^(ООО|АНО ДПО|ИП)\s*/,'').replace(/[«»"]/g,'')),
+      datasets:[{ data: rows.map(r=>r[1]), backgroundColor:"#e8a33d", borderRadius:5 }] },
+    options:{ indexAxis:'y', plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>" "+fmtMoney(ctx.raw)+" ₽"}}},
+      scales:{ x:{grid:{color:"#232a52"}, ticks:{callback:v=>fmtMoney(v)}}, y:{grid:{display:false}, ticks:{autoSkip:false, font:{size:11}}} },
+      responsive:true, maintainAspectRatio:false }
+  });
 }
 
 function buildModuleMaps(survey){
@@ -324,48 +481,6 @@ function buildModuleMaps(survey){
   return { modules, modShort };
 }
 
-/* ================= JSONP-ЗАГРУЗЧИК ================= */
-function jsonp(url){
-  return new Promise((resolve, reject)=>{
-    const cbName = 'jsonp_cb_' + Math.random().toString(36).slice(2);
-    const script = document.createElement('script');
-    const cleanup = () => { delete window[cbName]; script.remove(); };
-    window[cbName] = (data) => { resolve(data); cleanup(); };
-    script.onerror = () => { reject(new Error('Не удалось загрузить: ' + url)); cleanup(); };
-    script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cbName;
-    document.body.appendChild(script);
-  });
-}
-
-/* ================= ЗАГРУЗКА ДАННЫХ ================= */
-async function loadData(){
-  const statusEl = document.getElementById('syncStatus');
-  try {
-    const [clientsRes, surveyRes] = await Promise.all([
-      jsonp(CLIENTS_API),
-      jsonp(SURVEY_API)
-    ]);
-
-    const clients = clientsRes.clients
-      .map(classifyClient)
-      .filter(c => c.type === 'Внешний' && c.status !== 'excluded');
-
-    const internalCount = clientsRes.clients.filter(c => c.contour === 'Внутренний').length;
-
-    const survey = surveyRes.survey.filter(s => s.module);
-
-    renderDashboard(clients, survey, internalCount);
-
-    const updated = new Date(Math.max(new Date(clientsRes.updated), new Date(surveyRes.updated)));
-    statusEl.textContent = "Данные обновлены: " + updated.toLocaleString('ru-RU');
-    statusEl.classList.remove('error');
-  } catch (err) {
-    statusEl.textContent = "Не удалось загрузить свежие данные (" + err.message + "). Проверьте, что обе Google Apps Script ссылки развёрнуты с доступом «Все».";
-    statusEl.classList.add('error');
-    document.getElementById('loadingOverlay').textContent = "Не удалось загрузить данные — см. сообщение выше.";
-  }
-}
-
 /* ================= ОТРИСОВКА ДАШБОРДА ================= */
 function renderDashboard(clients, survey, internalCount){
   const { modules, modShort } = buildModuleMaps(survey);
@@ -375,26 +490,27 @@ function renderDashboard(clients, survey, internalCount){
   const revenueNoVat = totalRevenue * 0.78; // НДС 22%: выручка минус 22%
   const totalParticipants = clients.length;
   const totalAll = totalParticipants + internalCount;
-  const paidCount = clients.filter(c=>c.status==="paid").length;
-  const issueCount = clients.filter(c=>c.status==="issue").length;
   const overallNPS = calcNPS(survey.map(s=>s.q5));
 
-  document.getElementById('heroRevenue').textContent = revenueNoVat.toLocaleString('ru-RU',{minimumFractionDigits:2, maximumFractionDigits:2});
-  document.getElementById('heroNPS').textContent = overallNPS.toFixed(0) + "%";
-  document.getElementById('heroParticipants').textContent = totalAll;
-  document.getElementById('participantsSummary').textContent = `${totalAll} участников (${totalParticipants} внешних + ${internalCount} внутренних)`;
+  C1 = {
+    revenue: totalRevenue, revenueNoVat, nps: overallNPS, totalAll, external: totalParticipants, internal: internalCount,
+    responses: survey.length, companies: new Set(clients.map(c=>c.company).filter(x=>x && x!=='Физлицо')).size,
+    finished: null
+  };
+  if (activeTab !== "2") setHero(activeTab);
+  if (activeTab === "cmp") renderCompare();
 
   const kpis = [
     {val:revenueNoVat.toLocaleString('ru-RU',{minimumFractionDigits:2, maximumFractionDigits:2})+" ₽", lbl:"Выручка без НДС (ставка 22%)", cls:""},
     {val:fmtMoney(totalRevenue)+" ₽", lbl:"Выручка с НДС (для справки)", cls:""},
     {val:survey.length, lbl:"Всего ответов в опросе", cls:""},
-    {val:`${totalParticipants} / ${internalCount}`, lbl:"Внешних / внутренних участников", cls:""},
+    {val:C1.companies, lbl:"Компаний-клиентов (без физлиц)", cls:""},
   ];
   document.getElementById('kpiRow').innerHTML = kpis.map(k=>`
     <div class="kpi ${k.cls}"><div class="val">${k.val}</div><div class="lbl">${k.lbl}</div></div>
   `).join("");
 
-  document.getElementById('clientsNote').textContent = `${totalParticipants} строк · выручка ${fmtMoney(totalRevenue)} ₽`;
+  document.getElementById('clientsNote').textContent = `${totalParticipants} участников · ${C1.companies} компаний · ${fmtMoney(totalRevenue)} ₽ с НДС`;
   document.getElementById('commentsNote').textContent = `${survey.length} ответов из ${totalParticipants} участников`;
 
   /* --- STAIRCASE --- */
@@ -411,43 +527,16 @@ function renderDashboard(clients, survey, internalCount){
     </div>`;
   }).join("");
 
-  /* --- CLIENT TABLE + FILTERS --- */
-  let clientFilter = {status:"all"};
-  function renderClientFilters(){
-    const statusLabels = {all:"Все статусы",paid:"Оплачено",issue:"Уточняется"};
-    document.getElementById('clientFilters').innerHTML = Object.keys(statusLabels).map(s=>
-      `<button data-v="${s}" class="${clientFilter.status===s?'active':''}">${statusLabels[s]}</button>`
-    ).join("");
-    document.querySelectorAll('#clientFilters button').forEach(b=>{
-      b.onclick = ()=>{ clientFilter.status = b.dataset.v; renderClientFilters(); renderClientTable(); };
-    });
-  }
-  function renderClientTable(){
-    const rows = clients.filter(c=> clientFilter.status==="all" || c.status===clientFilter.status);
-    const statusBadge = {paid:'<span class="badge paid">оплачено</span>',issue:'<span class="badge issue">уточняется</span>',internal:'<span class="badge internal">внутренний</span>'};
-    const compBadge = c => c.completion==="cert" ? '<span class="badge cert">сертификат</span>' : '<span class="badge none">не сдан проект</span>';
-    document.querySelector('#clientTable tbody').innerHTML = rows.map(c=>`
-      <tr>
-        <td>${c.name}</td>
-        <td>${c.company}</td>
-        <td>${c.amount? fmtMoney(c.amount)+" ₽" : "—"}</td>
-        <td>${statusBadge[c.status]}</td>
-        <td>${compBadge(c)}</td>
-      </tr>
-    `).join("");
-  }
-  renderClientFilters(); renderClientTable();
+  /* --- CLIENT TABLE --- */
+  document.querySelector('#clientTable tbody').innerHTML = clients.map(c=>`
+    <tr><td>${c.name}</td><td>${c.company}</td><td>${c.amount? fmtMoney(c.amount)+" ₽" : "<span style='color:var(--muted-2)'>в счёте компании</span>"}</td></tr>`).join("");
 
   /* --- CHARTS --- */
   Chart.defaults.color = "#9099c0";
   Chart.defaults.font.family = "Inter";
   Chart.defaults.borderColor = "#2a3363";
 
-  new Chart(document.getElementById('paymentStatus'), {
-    type:'doughnut',
-    data:{ labels:["Оплачено","Уточняется"], datasets:[{data:[paidCount,issueCount], backgroundColor:["#6fbf9e","#e2687a"], borderWidth:0}]},
-    options:{ plugins:{legend:{position:'bottom', labels:{boxWidth:10,padding:14,font:{size:11}}}}, responsive:true, maintainAspectRatio:false, cutout:"62%" }
-  });
+  revenueByCompany('revenue1', clients);
 
   const critLabels = [
     "Актуальность, структура, достаточность",
@@ -524,7 +613,229 @@ function renderDashboard(clients, survey, internalCount){
   document.getElementById('dashboardBody').classList.remove('hidden');
 }
 
-loadData();
+/* ================= 2 ПОТОК: ДАННЫЕ ================= */
+/* Источник: таблица участников 2 потока (выгрузка 13.10.2026).
+   Сумма стоит у первого участника компании и покрывает всю группу.
+ */
+const C2_CLIENTS = [{"name": "Хлебникова Марина Андреевна","company": "ООО «ВЕРНИСАЖ паркет»","amount": 32300,"defended": false},{"name": "Онищенко Д.Ю.","company": "ООО «ТПК Аристо»","amount": 646000,"defended": false},{"name": "Шишкин Р.Н.","company": "ООО «ТПК Аристо»","amount": 0,"defended": false},{"name": "Цисельский М.В.","company": "ООО «ТПК Аристо»","amount": 0,"defended": false},{"name": "Семенов И.В.","company": "ООО «ТПК Аристо»","amount": 0,"defended": false},{"name": "Ефимов М.Д.","company": "ООО «ТПК Аристо»","amount": 0,"defended": false},{"name": "Лазарев Евгений","company": "ООО «ТПК Аристо»","amount": 0,"defended": true},{"name": "Лобов Артем","company": "ООО «ТПК Аристо»","amount": 0,"defended": true},{"name": "Прун В.В.","company": "ООО «ТПК Аристо»","amount": 0,"defended": false},{"name": "Архипова Ольга","company": "ООО «ТПК Аристо»","amount": 0,"defended": true},{"name": "Горюнов Сергей","company": "ООО «ТПК Аристо»","amount": 0,"defended": true},{"name": "Чистова М.С.","company": "ООО «ТПК Аристо»","amount": 0,"defended": false},{"name": "Холмогорова С.В.","company": "ООО «ТПК Аристо»","amount": 0,"defended": false},{"name": "Цисельский Николай","company": "ООО «ТПК Аристо»","amount": 0,"defended": true},{"name": "Есина О.И.","company": "ООО «ТПК Аристо»","amount": 0,"defended": false},{"name": "Комолова Элеонора","company": "ООО «ТПК Аристо»","amount": 0,"defended": true},{"name": "Варфоломеева Алия","company": "ООО «ТПК Аристо»","amount": 0,"defended": true},{"name": "Кузина Юлия","company": "ООО «ТПК Аристо»","amount": 0,"defended": true},{"name": "Лавринович Д.Л.","company": "ООО «ТПК Аристо»","amount": 0,"defended": false},{"name": "Папанова В.И.","company": "ООО «ТПК Аристо»","amount": 0,"defended": false},{"name": "Петров Александр","company": "ООО «ТПК Аристо»","amount": 0,"defended": true},{"name": "Холявко Э.Ю.","company": "ООО «ТПК Аристо»","amount": 0,"defended": false},{"name": "Кожевникова Екатерина","company": "ООО «ТПК Аристо»","amount": 0,"defended": true},{"name": "Писарева Виктория","company": "ООО «ТПК Аристо»","amount": 0,"defended": true},{"name": "Николаева Наталья","company": "ООО «ТПК Аристо»","amount": 0,"defended": true},{"name": "Шпекин М.Н.","company": "ООО «ТПК Аристо»","amount": 0,"defended": false},{"name": "Халепа Алексей Анатольевич","company": "ООО «Фламко РУС»","amount": 274550,"defended": true},{"name": "Халепа Андрей Анатольевич","company": "ООО «Фламко РУС»","amount": 0,"defended": false},{"name": "Смердов Иван Васильевич","company": "ООО «Фламко РУС»","amount": 0,"defended": true},{"name": "Седова Ксения Игоревна","company": "ООО «Фламко РУС»","amount": 0,"defended": true},{"name": "Белякова Дарья Вадимовна","company": "ООО «Фламко РУС»","amount": 0,"defended": false},{"name": "Юдин Илья Юрьевич","company": "ООО «Фламко РУС»","amount": 0,"defended": true},{"name": "Родионов Артём Петрович","company": "ООО «Фламко РУС»","amount": 0,"defended": true},{"name": "Манеева Алия Касимовна","company": "ООО «Фламко РУС»","amount": 0,"defended": true},{"name": "Проничева Алёна Борисовна","company": "ООО «Фламко РУС»","amount": 0,"defended": true},{"name": "Бурыкин Дмитрий Владимирович","company": "ООО «Фламко РУС»","amount": 0,"defended": true},{"name": "Василькова Олеся Викторовна","company": "Физлицо","amount": 32300,"defended": false},{"name": "Шаповалов Владимир Юрьевич","company": "ООО Дента Плюс","amount": 27455,"defended": false},{"name": "Севостьянов Андрей Сергеевич","company": "ООО Импульс","amount": 27455,"defended": false},{"name": "Фомина Алла Александровна","company": "ООО Импульс","amount": 27455,"defended": true},{"name": "Львова Елена Анатольевна","company": "ООО Импульс","amount": 27455,"defended": false},{"name": "Пихтин Григорий","company": "ООО Ингремарт","amount": 374000,"defended": false},{"name": "Крыгин Алексей","company": "ООО Ингремарт","amount": 0,"defended": false},{"name": "Якупов Эдуард","company": "ООО Ингремарт","amount": 0,"defended": false},{"name": "Иванова Марина","company": "ООО Ингремарт","amount": 0,"defended": false},{"name": "Помников Андрей","company": "ООО Ингремарт","amount": 0,"defended": false},{"name": "Боцок Андрей","company": "ООО Ингремарт","amount": 0,"defended": false},{"name": "Поляков Семен","company": "ООО Ингремарт","amount": 0,"defended": false},{"name": "Лобачев Андрей","company": "ООО Ингремарт","amount": 0,"defended": false},{"name": "Некрасов Олег","company": "ООО Ингремарт","amount": 0,"defended": false},{"name": "Михеев Антон","company": "ООО Ингремарт","amount": 0,"defended": false},{"name": "Гаврилов Сергей","company": "ООО Ингремарт","amount": 0,"defended": false},{"name": "Крыгин Александр","company": "ООО Ингремарт","amount": 0,"defended": false},{"name": "Якупов Вячеслав","company": "ООО Ингремарт","amount": 0,"defended": false},{"name": "Кадрова Мария","company": "ООО Ингремарт","amount": 0,"defended": false},{"name": "Дворкина Мария","company": "ООО Ингремарт","amount": 0,"defended": false},{"name": "Аникин Вячеслав","company": "ООО Ингремарт","amount": 0,"defended": false},{"name": "Мурыгина Александра","company": "ООО Ингремарт","amount": 0,"defended": false}];
+const C2_META = { dates: "22 сентября – 10 октября 2026", modules: 5 };
+/* Источник: «ОС по итогам курса "AI-незаменимы"_2 поток (Ответы)», Google Таблица, 31 ответ на 13.10.2026.
+   q1 актуальность/структура, q2 применимость, q3 тренер, q4 польза, q5 готовность рекомендовать (NPS). */
+const C2_SURVEY = [{"ts": "22.09.2026 21:52:53", "module": "Модуль 1. ChatGPT: чат и рабочие сценарии", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "спасибо за встречу, было очень интересно и познавательно как новичок в пользовании ИИ узнала для себя сегодня множество интересных функций и настроек", "who": "Алёна"}, {"ts": "22.09.2026 21:53:09", "module": "Модуль 1. ChatGPT: чат и рабочие сценарии", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Хорошей связи", "who": "Лазарев Евгений Михайлович"}, {"ts": "22.09.2026 22:23:30", "module": "Модуль 1. ChatGPT: чат и рабочие сценарии", "q1": 10, "q2": 8, "q3": 10, "q4": 9, "q5": 9, "comment": "Все понравилось", "who": "Писарева Виктория Георгиевна"}, {"ts": "22.09.2026 23:11:59", "module": "Модуль 1. ChatGPT: чат и рабочие сценарии", "q1": 9, "q2": 10, "q3": 10, "q4": 7, "q5": 8, "comment": "Я пользуюсь чатом джпт чуть больше полугода, интуитивно, собирая информацию в разных источниках, но не на специальных курсах. На уроке все равно была важная информация, и я уже знаю какую задачу и как буду решать с помощью нее.", "who": "Варфоломеева Алия"}, {"ts": "23.09.2026 6:44:40", "module": "Модуль 1. ChatGPT: чат и рабочие сценарии", "q1": 9, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Все прекрасно!", "who": ""}, {"ts": "23.09.2026 8:58:25", "module": "Модуль 1. ChatGPT: чат и рабочие сценарии", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Сложное объяснили просто — уже начал применять новые инструменты для своих задач.", "who": "Горюнов Сергей"}, {"ts": "23.09.2026 10:23:06", "module": "Модуль 1. ChatGPT: чат и рабочие сценарии", "q1": 9, "q2": 9, "q3": 9, "q4": 10, "q5": 9, "comment": "Мне понравилось", "who": "Эдуард Холявко"}, {"ts": "23.09.2026 12:55:19", "module": "Модуль 1. ChatGPT: чат и рабочие сценарии", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Очень полезный тренинг: много практических сценариев и готовых промптов. За первое проведенное обучение научилась точнее ставить задачи ИИ и встраивать его в рабочие процессы. Сразу применила в фиксации сроков по итогам совещаний. Стало намного быстрее и аккуратнее.", "who": "Кузина Юлия Викторовна"}, {"ts": "24.09.2026 22:11:25", "module": "Модуль 2. Claude: чат и рабочие сценарии", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Все отлично", "who": "Ксения Седова"}, {"ts": "24.09.2026 22:11:49", "module": "Модуль 2. Claude: чат и рабочие сценарии", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Успехов и процветания!", "who": "Варфоломеева Алия"}, {"ts": "24.09.2026 22:12:03", "module": "Модуль 2. Claude: чат и рабочие сценарии", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Все отлично", "who": "Юдин ИЮ"}, {"ts": "24.09.2026 22:13:52", "module": "Модуль 2. Claude: чат и рабочие сценарии", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Спасибо, все очень интересно, особенно создание скилов.", "who": "Писарева Виктория( Виктория_закупки)"}, {"ts": "25.09.2026 10:43:35", "module": "Модуль 2. Claude: чат и рабочие сценарии", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Возможно было бы хорошо сделать уроки короче, но в большем количестве. Достаточно поздно заканчиваем по времени.", "who": ""}, {"ts": "25.09.2026 11:33:03", "module": "Модуль 2. Claude: чат и рабочие сценарии", "q1": 10, "q2": 9, "q3": 10, "q4": 10, "q5": 10, "comment": "Надежда, во время обучения, где-то с периодичностью в 20 минут теряется связь. Это не критично, т.к. только пару слов выпадает из контекста. Я честно поставила в критерии 9, но это потому что для меня знания по Claude сложно применить, но я стараюсь и обучаюсь :)", "who": "Журавлева Снежана"}, {"ts": "25.09.2026 18:01:32", "module": "Модуль 2. Claude: чат и рабочие сценарии", "q1": 8, "q2": 9, "q3": 8, "q4": 9, "q5": 9, "comment": "Распределение потоков на группы по глубине знания, для новичков и продвинутых отдельно", "who": "Ефимов Максим Дмитриевич"}, {"ts": "26.09.2026 17:42:33", "module": "Модуль 2. Claude: чат и рабочие сценарии", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "полезное обучение, уже применил на практике, сэкономил много времени...", "who": "Горюнов Сергей"}, {"ts": "27.09.2026 14:12:11", "module": "Модуль 2. Claude: чат и рабочие сценарии", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Супер, очень подробно и доходно все объясняете.", "who": ""}, {"ts": "27.09.2026 17:19:00", "module": "Модуль 2. Claude: чат и рабочие сценарии", "q1": 8, "q2": 8, "q3": 9, "q4": 9, "q5": 8, "comment": "Более подробно объяснить методологию написания промта. Шаги по модулю можно потом сделать дома и увидеть результат, нужно понять как каждый шаг создать.", "who": ""}, {"ts": "29.09.2026 22:16:29", "module": "Модуль 3. Презентации и данные", "q1": 10, "q2": 9, "q3": 10, "q4": 10, "q5": 10, "comment": "Все очень полезно. Немного не успеваю за событиями при повторении, приходиться проходить заново. Возможно если заранее установить нужные скилы то обучение прошло бы эффективнее", "who": "Лазарев Евгений"}, {"ts": "29.09.2026 22:19:01", "module": "Модуль 3. Презентации и данные", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Модуль 1 и 2 было сложно: вся информация новая и сложно удерживать макс.концентрацию все 3 часа. Возможно хорошо было бы сократить время каждого занятия, но увеличить кол-во занятий.", "who": "Белякова Дарья"}, {"ts": "29.09.2026 22:55:54", "module": "Модуль 3. Презентации и данные", "q1": 6, "q2": 4, "q3": 5, "q4": 4, "q5": 4, "comment": "Ответ исключительно касаемо сегодняшнего урока - из-за перескакиваний из одного приложения в другое, затем в третье и обратно информацию сложно воспринимать. Лично мне не хватило структурности. Из монолога тренера за время урока в голове получилась абсолютная каша. Буду самостоятельно пересматривать весь материал на сайте и пытаться воспроизвести.", "who": ""}, {"ts": "01.10.2026 22:11:27", "module": "Модуль 4. База знаний без хаоса", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Доходчиво, интересно, полезно. Спасибо!", "who": "Горюнов Сергей"}, {"ts": "01.10.2026 22:11:48", "module": "Модуль 4. База знаний без хаоса", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Очень интересная информация на уроке, понравилась работа в notebook. Хочется однажды прийти к мастерству написания промптов, как у Надежды", "who": ""}, {"ts": "01.10.2026 22:12:51", "module": "Модуль 4. База знаний без хаоса", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Наконец-то я поняла как жить с этим ноушн легко, спасибо. И спасибо за крутой инструмент - нотебук ЛМ, буду пользоваться", "who": "Алия Варфоломеева"}, {"ts": "06.10.2026 20:43:58", "module": "Модуль 4. База знаний без хаоса", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Курс был весь просто великолепен! Если есть еще какие-то курсы, я готова посетить их!", "who": "Хлебникова Марина Андреевна"}, {"ts": "06.10.2026 20:44:20", "module": "Модуль 4. База знаний без хаоса", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Восхитительные проекты коллег, и однокурсников я в полном вдохновении! Спасибо за курс!", "who": "Алия Варфоломеева"}, {"ts": "06.10.2026 20:48:45", "module": "Модуль 4. База знаний без хаоса", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Надежда, огромное спасибо за пройденный курс! Вы дали нам очень много полезной и нужной информации, которая обязательно пригодится в нашей работе!", "who": "Кузина Юлия Викторовна"}, {"ts": "08.10.2026 12:03:37", "module": "Модуль 4. База знаний без хаоса", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 5, "comment": "Большой минус в том, что выдача сертификата связана с публичным выступлением. Рабочие задачи показывать не всегда корректно, а иногда и прямо запрещено, если есть подписанные соглашения о конф, также не все готовы показать личное, особенно если среди учащихся коллеги и руководители. Коллеги расстроились. Из-за этого рекомендовать курс не будем.", "who": "Седова Ксения"}, {"ts": "11.10.2026 12:19:20", "module": "Модуль 3. Презентации и данные", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Нет, все отлично", "who": "Седова Ксения"}, {"ts": "11.10.2026 12:20:34", "module": "Модуль 4. База знаний без хаоса", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Надежда, еще раз благодарю за курс! Ооочень полезно и вдохновляет особенно кейсы одногруппников", "who": "Алия Варфоломеева"}, {"ts": "11.10.2026 12:30:28", "module": "Модуль 4. База знаний без хаоса", "q1": 10, "q2": 10, "q3": 10, "q4": 10, "q5": 10, "comment": "Отличное обучение. Узнал какие инструменты можно дополнительно использовать о которых ранее не знал", "who": "Лазарев Евгений"}];
+const modShortOf = m => { const x = m.match(/(?:МК|Модуль)\s*(\d+)/); return x ? "МК" + x[1] : m.slice(0,6); };
+const C2_MODNAME = {"МК1":"МК1 ChatGPT","МК2":"МК2 Claude","МК3":"МК3 Презентации и данные","МК4":"МК4 База знаний"};
+
+let C1 = null;
+let activeTab = "2";
+let syncText = "Данные 1 потока: таблица продаж и опрос, выгрузка 13.10.2026";
+const fmt2 = n => n.toLocaleString('ru-RU',{minimumFractionDigits:2, maximumFractionDigits:2});
+const noVat = n => n * 0.78; // та же формула, что у 1 потока и в таблице оплат
+
+function c2Stats(){
+  const revenue = C2_CLIENTS.reduce((s,c)=>s+c.amount,0);
+  return {
+    revenue, revenueNoVat: noVat(revenue),
+    total: C2_CLIENTS.length,
+    companies: new Set(C2_CLIENTS.map(c=>c.company).filter(x=>x!=='Физлицо')).size,
+    defended: C2_CLIENTS.filter(c=>c.defended).length,
+    nps: calcNPS(C2_SURVEY.map(s=>s.q5)),
+    responses: C2_SURVEY.length
+  };
+}
+
+/* ================= HERO ПО ВКЛАДКЕ ================= */
+function setHero(tab){
+  const $ = id => document.getElementById(id);
+  const status = $('syncStatus');
+  if (tab === "2"){
+    const s = c2Stats();
+    $('heroTitle').innerHTML = "AI-НЕЗАМЕНИМЫ<br>итоги 2 потока";
+    $('heroSub').textContent = `${C2_META.dates} · ${C2_META.modules} модулей и защита проектов · ${s.total} участников, ${s.companies} компаний · ${s.responses} ответ обратной связи.`;
+    $('heroRevenue').textContent = fmt2(s.revenueNoVat);
+    $('heroNPS').textContent = s.nps.toFixed(0) + "%";
+    $('heroMidLbl').textContent = "средний NPS";
+    $('heroParticipants').textContent = s.total;
+    status.textContent = "Данные: таблица участников от 13.10.2026";
+    status.classList.remove('error');
+    return;
+  }
+  $('heroTitle').innerHTML = tab === "cmp" ? "AI-НЕЗАМЕНИМЫ<br>два потока рядом" : "AI-НЕЗАМЕНИМА<br>итоги 1 потока для ассистентов";
+  $('heroMidLbl').textContent = "средний NPS (1 поток)";
+  status.textContent = syncText;
+  status.classList.toggle('error', syncText.indexOf('Не удалось') === 0);
+  if (tab === "cmp"){
+    const s = c2Stats();
+    $('heroSub').textContent = "Выручка, участники, завершение курса и NPS по обоим потокам.";
+    $('heroRevenue').textContent = C1 ? fmt2(C1.revenueNoVat + s.revenueNoVat) : "—";
+    $('heroNPS').textContent = C1 ? `${C1.nps.toFixed(0)}% → ${s.nps.toFixed(0)}%` : "—";
+    $('heroMidLbl').textContent = "NPS: 1 поток → 2 поток";
+    $('heroParticipants').textContent = C1 ? C1.totalAll + s.total : "—";
+    return;
+  }
+  $('heroSub').textContent = C1
+    ? `Май–июнь 2026 · 5 модулей, ${C1.responses} ответов обратной связи и ${C1.totalAll} участников из ${C1.companies} компаний — от первого погружения в AI до защиты собственного AI-рабочего дня.`
+    : "5 модулей — от первого погружения в AI до защиты собственного AI-рабочего дня.";
+  $('heroRevenue').textContent = C1 ? fmt2(C1.revenueNoVat) : "—";
+  $('heroNPS').textContent = C1 ? C1.nps.toFixed(0) + "%" : "—";
+  $('heroParticipants').textContent = C1 ? C1.totalAll : "—";
+}
+
+/* ================= 2 ПОТОК: ОТРИСОВКА ================= */
+function renderCohort2(){
+  const s = c2Stats();
+  document.getElementById('kpiRow2').innerHTML = [
+    {val: fmt2(s.revenueNoVat)+" ₽", lbl:"Выручка без НДС (та же формула, что у 1 потока)", cls:""},
+    {val: fmtMoney(s.revenue)+" ₽", lbl:"Выручка с НДС (для справки)", cls:""},
+    {val: s.nps.toFixed(0)+"%", lbl:`Средний NPS · ${s.responses} ответ в опросе`, cls:""},
+    {val: `${s.defended} из ${s.total}`, lbl:"Защитили проект", cls:"mint"},
+  ].map(k=>`<div class="kpi ${k.cls}"><div class="val">${k.val}</div><div class="lbl">${k.lbl}</div></div>`).join("");
+
+  document.getElementById('clientsNote2').textContent = `${s.total} участников · ${s.companies} компаний · ${fmtMoney(s.revenue)} ₽ с НДС`;
+
+  let f = "all";
+  function renderFilters(){
+    const labels = {all:"Все", defended:"Защитили проект"};
+    document.getElementById('clientFilters2').innerHTML = Object.keys(labels).map(k=>
+      `<button data-v="${k}" class="${f===k?'active':''}">${labels[k]}</button>`).join("");
+    document.querySelectorAll('#clientFilters2 button').forEach(b=> b.onclick = ()=>{ f=b.dataset.v; renderFilters(); renderTable(); });
+  }
+  function renderTable(){
+    const rows = C2_CLIENTS.filter(c => f==="all" || c.defended);
+    document.querySelector('#clientTable2 tbody').innerHTML = rows.map(c=>`
+      <tr>
+        <td>${c.name}</td>
+        <td>${c.company}</td>
+        <td>${c.amount ? fmtMoney(c.amount)+" ₽" : "<span style='color:var(--muted-2)'>в счёте компании</span>"}</td>
+        <td>${c.defended ? '<span class="badge defended">защитил проект</span>' : '<span class="badge none">нет защиты</span>'}</td>
+      </tr>`).join("");
+  }
+  renderFilters(); renderTable();
+
+  Chart.defaults.color = "#9099c0";
+  Chart.defaults.font.family = "Inter";
+  Chart.defaults.borderColor = "#2a3363";
+
+  revenueByCompany('revenue2', C2_CLIENTS);
+
+  const comps = [...new Set(C2_CLIENTS.map(c=>c.company))]
+    .map(name=>{ const list = C2_CLIENTS.filter(c=>c.company===name); return {name, n:list.length, d:list.filter(c=>c.defended).length}; })
+    .sort((a,b)=>b.n-a.n);
+  new Chart(document.getElementById('companies2'), {
+    type:'bar',
+    data:{ labels: comps.map(c=>c.name.replace(/^ООО\s*/,'').replace(/[«»]/g,'')),
+      datasets:[
+        {label:"Участников", data:comps.map(c=>c.n), backgroundColor:"#7fa8e0", borderRadius:6},
+        {label:"Защитили проект", data:comps.map(c=>c.d), backgroundColor:"#6fbf9e", borderRadius:6}
+      ]},
+    options:{ indexAxis:'y', scales:{ x:{grid:{color:"#232a52"},ticks:{precision:0}}, y:{grid:{display:false}} },
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:14,font:{size:11}}}},
+      responsive:true, maintainAspectRatio:false }
+  });
+
+  /* --- ОБРАТНАЯ СВЯЗЬ 2 ПОТОКА --- */
+  const mods = [...new Set(C2_SURVEY.map(r=>modShortOf(r.module)))].sort();
+  const byMod = m => C2_SURVEY.filter(r=>modShortOf(r.module)===m);
+
+  document.getElementById('staircase2').innerHTML = mods.map(m=>{
+    const rows = byMod(m), nps = calcNPS(rows.map(r=>r.q5));
+    const h = Math.max(24, ((nps+100)/200) * 170);
+    return `<div class="step"><div class="bar" style="height:${h}px"><div class="score">${nps.toFixed(0)}%</div></div>
+      <div class="name">${C2_MODNAME[m] || m}</div><div class="n">n=${rows.length}</div></div>`;
+  }).join("");
+
+  const critLabels = ["Актуальность, структура, достаточность","Применимость на практике","Работа тренера","Польза участия"];
+  const critColors = ["#e8a33d","#6fbf9e","#7fa8e0","#c9a3e8"];
+  new Chart(document.getElementById('moduleScores2'), {
+    type:'line',
+    data:{ labels: mods.map(m=>C2_MODNAME[m]||m),
+      datasets: ["q1","q2","q3","q4"].map((k,i)=>({ label:critLabels[i], data: mods.map(m=>avg(byMod(m).map(r=>r[k]))),
+        borderColor:critColors[i], backgroundColor:critColors[i], tension:0.35, pointRadius:4, borderWidth:2 })) },
+    options:{ scales:{ y:{min:0,max:10,grid:{color:"#232a52"}}, x:{grid:{display:false}} },
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:14,font:{size:11}}},
+        tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.raw.toFixed(2)}`}}},
+      responsive:true, maintainAspectRatio:false }
+  });
+
+  new Chart(document.getElementById('npsChart2'), {
+    type:'bar',
+    data:{ labels: mods.map(m=>C2_MODNAME[m]||m),
+      datasets:[{ label:"NPS, %", data: mods.map(m=>calcNPS(byMod(m).map(r=>r.q5))), backgroundColor:"#e8a33d", borderRadius:6 }] },
+    options:{ scales:{ y:{min:-100,max:100,grid:{color:"#232a52"},ticks:{callback:v=>v+"%"}}, x:{grid:{display:false}} },
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>` NPS ${ctx.raw.toFixed(0)}%`}}}, responsive:true, maintainAspectRatio:false }
+  });
+
+  document.getElementById('commentsNote2').textContent = `${s.responses} ответ · ${C2_SURVEY.filter(r=>r.who).length} с подписью`;
+  const esc = t => String(t).replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+  let cf = {module:"all", lowOnly:false};
+  function renderCF(){
+    let html = `<button data-m="all" class="${cf.module==='all'?'active':''}">Все модули</button>`;
+    mods.forEach(m=> html += `<button data-m="${m}" class="${cf.module===m?'active':''}">${m}</button>`);
+    html += `<button data-low="1" class="${cf.lowOnly?'active':''}">Только оценки ниже 7</button>`;
+    document.getElementById('commentFilters2').innerHTML = html;
+    document.querySelectorAll('#commentFilters2 button[data-m]').forEach(b=> b.onclick = ()=>{ cf.module=b.dataset.m; renderCF(); renderCL(); });
+    document.querySelector('#commentFilters2 button[data-low]').onclick = ()=>{ cf.lowOnly=!cf.lowOnly; renderCF(); renderCL(); };
+  }
+  function renderCL(){
+    let rows = C2_SURVEY.filter(r=> cf.module==="all" || modShortOf(r.module)===cf.module);
+    if (cf.lowOnly) rows = rows.filter(r=> Math.min(r.q1,r.q2,r.q3,r.q4,r.q5) < 7);
+    document.getElementById('commentsList2').innerHTML = rows.map(r=>`
+      <div class="comment">
+        <div class="meta"><span>${C2_MODNAME[modShortOf(r.module)] || r.module} · ${r.ts.split(' ')[0]}</span>
+          <span class="score ${r.q5<7?'low':''}">NPS ${r.q5}</span></div>
+        <p>${r.comment ? esc(r.comment) : "<i>без комментария</i>"}</p>
+        ${r.who ? `<div class="who">${esc(r.who)}</div>` : ""}
+      </div>`).join("") || "<p style='color:var(--muted)'>Нет комментариев по выбранным фильтрам.</p>";
+  }
+  renderCF(); renderCL();
+}
+
+/* ================= СРАВНЕНИЕ ================= */
+let cmpCharts = [];
+function renderCompare(){
+  const s = c2Stats();
+  const v1 = (fn, f) => C1 ? f(fn(C1)) : "—";
+  const pct = (a,b) => b ? Math.round(a/b*100)+"%" : "—";
+  const rows = [
+    ["Выручка без НДС, ₽", v1(c=>c.revenueNoVat, fmt2), fmt2(s.revenueNoVat)],
+    ["Выручка с НДС, ₽", v1(c=>c.revenue, fmtMoney), fmtMoney(s.revenue)],
+    ["Участников всего", v1(c=>c.totalAll, String), s.total],
+        ["Компаний-клиентов", v1(c=>c.companies, String), s.companies],
+    ["Защитили проект", "нет данных", `${s.defended} · ${pct(s.defended, s.total)}`],
+    ["Средний NPS", v1(c=>c.nps, x=>x.toFixed(0)+"%"), s.nps.toFixed(0)+"%"],
+    ["Ответов в опросе", v1(c=>c.responses, String), s.responses],
+  ];
+  document.querySelector('#cmpTable tbody').innerHTML = rows.map(r=>`<tr><td>${r[0]}</td><td class="num">${r[1]}</td><td class="num">${r[2]}</td></tr>`).join("");
+
+  cmpCharts.forEach(c=>c.destroy()); cmpCharts = [];
+  if (!C1) return;
+  const opts = {plugins:{legend:{display:false}}, scales:{y:{grid:{color:"#232a52"},beginAtZero:true}, x:{grid:{display:false}}}, responsive:true, maintainAspectRatio:false};
+  cmpCharts.push(new Chart(document.getElementById('cmpRevenue'), {type:'bar',
+    data:{labels:["1 поток","2 поток"], datasets:[{data:[C1.revenueNoVat, s.revenueNoVat], backgroundColor:["#9099c0","#e8a33d"], borderRadius:6}]},
+    options:{...opts, scales:{...opts.scales, y:{...opts.scales.y, ticks:{callback:v=>fmtMoney(v)}}},
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>" "+fmt2(ctx.raw)+" ₽"}}}}}));
+  cmpCharts.push(new Chart(document.getElementById('cmpPeople'), {type:'bar',
+    data:{labels:["1 поток","2 поток"], datasets:[
+      {label:"Участников", data:[C1.totalAll, s.total], backgroundColor:"#7fa8e0", borderRadius:6},
+      {label:"Ответов в опросе", data:[C1.responses, s.responses], backgroundColor:"#e8a33d", borderRadius:6}]},
+    options:{...opts, plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:14,font:{size:11}}}}}}));
+}
+
+/* ================= ВКЛАДКИ ================= */
+document.querySelectorAll('#cohortTabs button').forEach(b=>{
+  b.onclick = ()=>{
+    activeTab = b.dataset.v;
+    document.querySelectorAll('#cohortTabs button').forEach(x=>x.classList.toggle('active', x===b));
+    document.getElementById('view1').classList.toggle('hidden', activeTab!=="1");
+    document.getElementById('view2').classList.toggle('hidden', activeTab!=="2");
+    document.getElementById('viewCmp').classList.toggle('hidden', activeTab!=="cmp");
+    if (activeTab === "cmp") renderCompare();
+    setHero(activeTab);
+  };
+});
+
+renderCohort2();
+setHero("2");
+renderDashboard(C1_CLIENTS, C1_SURVEY, 0);
 </script>
 </body>
 </html>
