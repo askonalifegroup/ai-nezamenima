@@ -277,7 +277,7 @@ footer{text-align:center;color:var(--muted-2);font-size:12px;margin-top:60px;}
   <!-- ================= СРАВНЕНИЕ ================= -->
   <div id="viewCmp" class="hidden">
     <section>
-      <div class="section-head"><h2>1 поток и 2 поток рядом</h2><div class="note">выручка без НДС посчитана одинаково для обоих потоков</div></div>
+      <div class="section-head"><h2>1 поток и 2 поток рядом</h2><div class="note">выручка без НДС = сумма с НДС ÷ 1,22 для обоих потоков</div></div>
       <div class="card">
         <table class="cmp" id="cmpTable">
           <thead><tr><th>Показатель</th><th class="num">1 поток</th><th class="num">2 поток</th></tr></thead>
@@ -487,7 +487,7 @@ function renderDashboard(clients, survey, internalCount){
 
   /* --- KPI --- */
   const totalRevenue = clients.reduce((s,c)=>s+c.amount,0);
-  const revenueNoVat = totalRevenue * 0.78; // НДС 22%: выручка минус 22%
+  const revenueNoVat = noVat(totalRevenue);
   const totalParticipants = clients.length;
   const totalAll = totalParticipants + internalCount;
   const overallNPS = calcNPS(survey.map(s=>s.q5));
@@ -501,7 +501,7 @@ function renderDashboard(clients, survey, internalCount){
   if (activeTab === "cmp") renderCompare();
 
   const kpis = [
-    {val:revenueNoVat.toLocaleString('ru-RU',{minimumFractionDigits:2, maximumFractionDigits:2})+" ₽", lbl:"Выручка без НДС (ставка 22%)", cls:""},
+    {val:revenueNoVat.toLocaleString('ru-RU',{minimumFractionDigits:2, maximumFractionDigits:2})+" ₽", lbl:"Выручка без НДС (сумма с НДС ÷ 1,22)", cls:""},
     {val:fmtMoney(totalRevenue)+" ₽", lbl:"Выручка с НДС (для справки)", cls:""},
     {val:survey.length, lbl:"Всего ответов в опросе", cls:""},
     {val:C1.companies, lbl:"Компаний-клиентов (без физлиц)", cls:""},
@@ -629,7 +629,7 @@ let C1 = null;
 let activeTab = "2";
 let syncText = "Данные 1 потока: таблица продаж и опрос, выгрузка 13.10.2026";
 const fmt2 = n => n.toLocaleString('ru-RU',{minimumFractionDigits:2, maximumFractionDigits:2});
-const noVat = n => n * 0.78; // та же формула, что у 1 потока и в таблице оплат
+const noVat = n => n / 1.22; // суммы указаны с НДС 22%: выручка без НДС = сумма / 1,22
 
 function c2Stats(){
   const revenue = C2_CLIENTS.reduce((s,c)=>s+c.amount,0);
@@ -684,7 +684,7 @@ function setHero(tab){
 function renderCohort2(){
   const s = c2Stats();
   document.getElementById('kpiRow2').innerHTML = [
-    {val: fmt2(s.revenueNoVat)+" ₽", lbl:"Выручка без НДС (та же формула, что у 1 потока)", cls:""},
+    {val: fmt2(s.revenueNoVat)+" ₽", lbl:"Выручка без НДС (сумма с НДС ÷ 1,22)", cls:""},
     {val: fmtMoney(s.revenue)+" ₽", lbl:"Выручка с НДС (для справки)", cls:""},
     {val: s.nps.toFixed(0)+"%", lbl:`Средний NPS · ${s.responses} ответ в опросе`, cls:""},
     {val: `${s.defended} из ${s.total}`, lbl:"Защитили проект", cls:"mint"},
